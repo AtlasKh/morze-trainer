@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Морзе — тренажер</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Морзе">
+<meta name="theme-color" content="#070b10">
+<meta name="description" content="Вчи та тренуй азбуку Морзе: дерево, ключ, декодер, тести. Українська та англійська.">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{
+  --bg:#070b10; --panel:#0e151e; --panel2:#15202c; --line:#223040;
+  --txt:#e8eff7; --dim:#8296ab; --acc:#3ddc84; --accd:#1b7a49;
+  --amber:#ffc46b; --red:#ff6b5e; --r:14px;
+  --top:env(safe-area-inset-top); --bot:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  background:var(--bg); color:var(--txt);
+  font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased; user-select:none; -webkit-user-select:none;
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+#app{display:flex;flex-direction:column;height:100dvh;height:100vh}
+/* ---------- header ---------- */
+header{
+  padding:calc(var(--top) + 8px) 12px 8px; background:var(--panel);
+  border-bottom:1px solid var(--line); flex:0 0 auto; z-index:5
+}
+.hrow{display:flex;align-items:center;gap:8px}
+.brand{font-size:13px;letter-spacing:.14em;color:var(--dim);font-weight:600;flex:1}
+.brand b{color:var(--acc)}
+.chip{
+  border:1px solid var(--line);background:var(--panel2);border-radius:999px;
+  padding:6px 12px;font-size:13px;font-weight:600;color:var(--txt)
+}
+.chip:active{background:#1d2a39}
+.chip.on{border-color:var(--accd);color:var(--acc)}
+/* ---------- decode strip ---------- */
+.strip{margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.striphead{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.lbl{font-size:10px;letter-spacing:.16em;color:var(--dim);flex:1;text-transform:uppercase}
+.mini{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:3px 8px}
+.mini:active{color:var(--acc);border-color:var(--accd)}
+.out{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:22px; line-height:1.25;
+  min-height:30px; max-height:76px; overflow-y:auto; word-break:break-word; letter-spacing:.04em
+}
+.out .ph{color:#3c4c5e}
+.out .cur{color:var(--amber)}
+.bufrow{display:flex;align-items:center;gap:10px;margin-top:6px;min-height:20px}
+.bufg{display:flex;align-items:center;gap:5px;min-height:14px;flex:1;flex-wrap:wrap}
+.bufc{font-size:15px;font-weight:700;color:var(--acc);font-family:ui-monospace,monospace}
+.bufc.no{color:var(--red)}
+/* morse glyphs */
+.g{display:inline-block;background:var(--acc);border-radius:99px;vertical-align:middle}
+.g.d{width:8px;height:8px}
+.g.h{width:22px;height:8px}
+.gs{display:inline-flex;align-items:center;gap:5px}
+.gs.sm .g.d{width:6px;height:6px}.gs.sm .g.h{width:16px;height:6px}
+.gs.lg .g.d{width:14px;height:14px}.gs.lg .g.h{width:40px;height:14px}
+.gs.lg{gap:9px}
+.gs.am .g{background:var(--amber)}
+/* ---------- screens ---------- */
+main{flex:1 1 auto;position:relative;min-height:0}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;min-height:0}
+.screen.on{display:flex}
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 20px;flex:1}
+/* ---------- tree ---------- */
+#treewrap{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 8px;min-height:0}
+#treewrap svg{display:block;margin:0 auto}
+.nd circle{fill:var(--panel2);stroke:var(--line);stroke-width:1.5}
+.nd text{fill:var(--dim);font:600 13px -apple-system,sans-serif;text-anchor:middle;dominant-baseline:central}
+.nd.has circle{fill:var(--panel2);stroke:#33475c}
+.nd.has text{fill:var(--txt)}
+.nd.on circle{fill:#173a28;stroke:var(--accd)}
+.nd.on text{fill:var(--acc)}
+.nd.cur circle{fill:var(--acc);stroke:var(--acc)}
+.nd.cur text{fill:#06220f}
+.ed{stroke:#1d2a37;stroke-width:1.5;fill:none}
+.ed.on{stroke:var(--accd)}
+.sym{fill:#35485c}
+.sym.on{fill:var(--acc)}
+.rootg path{stroke:var(--acc);stroke-width:2;fill:none;stroke-linecap:round}
+/* ---------- keypad ---------- */
+.pad{flex:0 0 auto;padding:8px 12px calc(var(--bot) + 8px);background:var(--panel);border-top:1px solid var(--line)}
+.padrow{display:flex;gap:6px;margin-bottom:8px}
+.pb{
+  flex:1;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
+  display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;color:var(--dim)
+}
+.pb:active{background:#1d2a39;color:var(--txt)}
+.key{
+  width:100%;height:92px;border-radius:18px;background:linear-gradient(#1a2735,#111a24);
+  border:1px solid #2b3d50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  box-shadow:0 4px 0 #0a1017, inset 0 1px 0 #35485c; touch-action:none;transition:transform .04s
+}
+.key .kt{font-size:15px;font-weight:700;letter-spacing:.1em;color:var(--txt)}
+.key .ks{font-size:11px;color:var(--dim)}
+.key.on{background:linear-gradient(#23d179,#1a9e5b);border-color:#3ddc84;transform:translateY(3px);box-shadow:0 1px 0 #0a1017}
+.key.on .kt,.key.on .ks{color:#052913}
+/* ---------- cards / lists ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.card h3{margin:0 0 8px;font-size:14px;letter-spacing:.06em;color:var(--dim);text-transform:uppercase;font-weight:600}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:7px}
+.tc{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center}
+.tc:active{border-color:var(--accd)}
+.tc b{display:block;font-size:17px;margin-bottom:5px}
+.tc .gs{justify-content:center;min-height:10px}
+/* ---------- tests ---------- */
+.lv{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:8px;width:100%;text-align:left}
+.lv:active{border-color:var(--accd)}
+.lv.lock{opacity:.45}
+.lvn{width:34px;height:34px;flex:0 0 auto;border-radius:10px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--dim)}
+.lv.done .lvn{background:#143524;border-color:var(--accd);color:var(--acc)}
+.lvb{flex:1;min-width:0}
+.lvt{font-size:15px;font-weight:600}
+.lvs{font-size:12px;color:var(--dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stars{font-size:12px;letter-spacing:1px;color:#33475c}
+.stars i{font-style:normal}
+.stars i.f{color:var(--amber)}
+.qwrap{flex:1;display:flex;flex-direction:column;min-height:0}
+.qtop{display:flex;align-items:center;gap:10px;padding:10px 12px 0}
+.bar{flex:1;height:5px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .25s}
+.qbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;min-height:0}
+.qask{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.qbig{font-size:64px;font-weight:700;line-height:1}
+.qmorse{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;max-width:320px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:420px;padding:0 12px calc(var(--bot) + 12px)}
+.opt{
+  min-height:62px;border:1px solid var(--line);background:var(--panel);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;padding:8px
+}
+.opt.w{font-size:17px;letter-spacing:.04em}
+.opt:active{background:var(--panel2)}
+.opt.ok{background:#143c28;border-color:var(--acc);color:var(--acc)}
+.opt.bad{background:#3c1a18;border-color:var(--red);color:var(--red)}
+.opt.ok .g{background:var(--acc)}.opt.bad .g{background:var(--red)}
+.spk{width:92px;height:92px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:36px}
+.spk.on{background:#143c28;border-color:var(--acc)}
+.res{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:20px}
+.res .pc{font-size:56px;font-weight:700;color:var(--acc)}
+.btn{display:block;width:100%;max-width:320px;height:48px;border-radius:12px;background:var(--acc);color:#05230f;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center}
+.btn.sec{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+.btn:active{opacity:.85}
+/* ---------- text mode ---------- */
+textarea{
+  width:100%;min-height:84px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  color:var(--txt);padding:12px;font:17px/1.4 -apple-system,sans-serif;resize:none;user-select:text;-webkit-user-select:text
+}
+textarea:focus{outline:none;border-color:var(--accd)}
+.mout{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;line-height:1.9;word-break:break-word;color:var(--acc);min-height:40px;user-select:text;-webkit-user-select:text}
+.mout i{font-style:normal;padding:1px 2px;border-radius:4px}
+.mout i.hl{background:var(--acc);color:#05230f}
+.mout s{color:var(--dim);text-decoration:none}
+.led{width:16px;height:16px;border-radius:50%;background:#1d2a37;border:1px solid var(--line);flex:0 0 auto}
+.led.on{background:var(--acc);box-shadow:0 0 14px var(--acc)}
+/* ---------- settings ---------- */
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .rl{flex:1;font-size:15px}
+.row .rv{font-size:14px;color:var(--acc);font-family:ui-monospace,monospace}
+input[type=range]{-webkit-appearance:none;width:100%;height:28px;background:none}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--panel2);border-radius:99px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--acc);margin-top:-9px}
+.sw{width:50px;height:30px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);position:relative;flex:0 0 auto}
+.sw i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--dim);transition:.16s}
+.sw.on{background:#143524;border-color:var(--accd)}
+.sw.on i{left:23px;background:var(--acc)}
+.seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;height:32px;border-radius:8px;font-size:14px;font-weight:600;color:var(--dim)}
+.seg button.on{background:var(--acc);color:#05230f}
+p.hint{font-size:13px;color:var(--dim);line-height:1.6;margin:8px 0 0}
+p.hint b{color:var(--txt)}
+/* ---------- tabbar ---------- */
+nav{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:var(--bot)}
+nav button{flex:1;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:10px;letter-spacing:.03em}
+nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--acc)}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+
+<header>
+  <div class="hrow">
+    <div class="brand"><b>·−</b> <span id="brandTxt">МОРЗЕ</span></div>
+    <button class="chip" id="langBtn">УКР</button>
+    <button class="chip" id="setBtn" aria-label="settings">⚙︎</button>
+  </div>
+  <div class="strip" id="strip">
+    <div class="striphead">
+      <span class="lbl" id="lblDec">розшифровка</span>
+      <button class="mini" id="copyBtn">copy</button>
+      <button class="mini" id="clrBtn">clear</button>
+    </div>
+    <div class="out" id="out"><span class="ph" id="outPh">…</span></div>
+    <div class="bufrow"><span class="bufg gs" id="bufG"></span><span class="bufc" id="bufC"></span></div>
+  </div>
+</header>
+
+<main>
+  <!-- ======= KEY ======= -->
+  <section class="screen on" id="sc-key">
+    <div id="treewrap"></div>
+    <div class="pad">
+      <div class="padrow">
+        <button class="pb" id="bDot"><span class="gs"><span class="g d"></span></span></button>
+        <button class="pb" id="bDash"><span class="gs"><span class="g h"></span></span></button>
+        <button class="pb" id="bLet">↵</button>
+        <button class="pb" id="bSpc">␣</button>
+        <button class="pb" id="bDel">⌫</button>
+      </div>
+      <button class="key" id="key">
+        <span class="kt" id="keyT">КЛЮЧ</span>
+        <span class="ks" id="keyS">тап — крапка · утримуй — тире</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ======= TEXT ======= -->
+  <section class="screen" id="sc-text">
+    <div class="scroll">
+      <div class="card">
+        <h3 id="t_txtIn">текст</h3>
+        <textarea id="txtIn" rows="3" placeholder="SOS"></textarea>
+      </div>
+      <div class="card">
+        <h3 id="t_txtOut">морзе</h3>
+        <div class="mout" id="mout"></div>
+        <div class="row" style="border:0;padding-bottom:0">
+          <span class="led" id="led"></span>
+          <button class="btn" id="playBtn" style="max-width:none">▶︎</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 id="t_quick">—</h3>
+        <div class="tgrid" id="quickGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= TESTS ======= -->
+  <section class="screen" id="sc-test">
+    <div class="scroll" id="lvList"></div>
+    <div class="qwrap hide" id="quiz">
+      <div class="qtop">
+        <button class="mini" id="qExit">✕</button>
+        <div class="bar"><i id="qBar" style="width:0"></i></div>
+        <span class="lbl" id="qCount">0/0</span>
+      </div>
+      <div class="qbody" id="qBody"></div>
+      <div class="opts" id="qOpts"></div>
+    </div>
+  </section>
+
+  <!-- ======= CHART ======= -->
+  <section class="screen" id="sc-chart">
+    <div class="scroll">
+      <div class="card"><h3 id="t_letters">літери</h3><div class="tgrid" id="gLet"></div></div>
+      <div class="card"><h3 id="t_digits">цифри</h3><div class="tgrid" id="gDig"></div></div>
+      <div class="card"><h3 id="t_punct">знаки</h3><div class="tgrid" id="gPun"></div></div>
+      <div class="card"><h3 id="t_tips">поради</h3><p class="hint" id="tipsTxt"></p></div>
+    </div>
+  </section>
+
+  <!-- ======= SETTINGS ======= -->
+  <section class="screen" id="sc-set">
+    <div class="scroll">
+      <div class="card">
+        <h3 id="t_lang">мова</h3>
+        <div class="seg" id="segLang"><button data-l="uk">Українська</button><button data-l="en">English</button></div>
+        <p class="hint" id="langHint"></p>
+      </div>
+      <div class="card">
+        <h3 id="t_sound">звук</h3>
+        <div class="row"><span class="rl" id="t_wpm">Швидкість</span><span class="rv" id="vWpm">12</span></div>
+        <input type="range" id="rWpm" min="6" max="28" step="1">
+        <div class="row"><span class="rl" id="t_freq">Тон</span><span class="rv" id="vFreq">600 Hz</span></div>
+        <input type="range" id="rFreq" min="350" max="1000" step="10">
+        <div class="row"><span class="rl" id="t_key">Звук ключа</span><button class="sw on" id="swSnd"><i></i></button></div>
+        <div class="row"><span class="rl" id="t_auto">Авто-розділення літер</span><button class="sw on" id="swAuto"><i></i></button></div>
+      </div>
+      <div class="card">
+        <h3 id="t_home">на екран «Домівка»</h3>
+        <p class="hint" id="homeTxt"></p>
+      </div>
+      <div class="card">
+        <h3 id="t_prog">прогрес</h3>
+        <button class="btn sec" id="resetBtn" style="max-width:none">reset</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav id="tabs">
+  <button data-s="key" class="on"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><rect x="10" y="10" width="10" height="4" rx="2"/></svg><span id="tab1">Ключ</span></button>
+  <button data-s="text"><svg viewBox="0 0 24 24"><path d="M4 7V5h16v2M12 5v14M9 19h6"/></svg><span id="tab2">Текст</span></button>
+  <button data-s="test"><svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span id="tab3">Тести</span></button>
+  <button data-s="chart"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18M9 10v10"/></svg><span id="tab4">Таблиця</span></button>
+</nav>
+</div>
+<script>
+(function(){
+'use strict';
+/* ============ DATA ============ */
+var EN={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..'};
+var UA={'А':'.-','Б':'-...','В':'.--','Г':'--.','Ґ':'--.','Д':'-..','Е':'.','Є':'..-..','Ж':'...-','З':'--..','И':'-.--','І':'..','Ї':'.---.','Й':'.---','К':'-.-','Л':'.-..','М':'--','Н':'-.','О':'---','П':'.--.','Р':'.-.','С':'...','Т':'-','У':'..-','Ф':'..-.','Х':'....','Ц':'-.-.','Ч':'---.','Ш':'----','Щ':'--.-','Ь':'-..-','Ю':'..--','Я':'.-.-'};
+var DIG={'1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.','0':'-----'};
+var PUN={'.':'.-.-.-',',':'--..--','?':'..--..','!':'-.-.--','/':'-..-.','-':'-....-','(':'-.--.',')':'-.--.-',':':'---...','=':'-...-','+':'.-.-.','@':'.--.-.',"'":'.----.','"':'.-..-.'};
+var ENC={}; (function(){ var m,k; [EN,UA,DIG,PUN].forEach(function(o){for(k in o) if(!(k in ENC)) ENC[k]=o[k];}); })();
+var REV={uk:{},en:{}};
+(function(){
+  function fill(dst,src){ for(var k in src) if(!(src[k] in dst)) dst[src[k]]=k; }
+  fill(REV.en,EN); fill(REV.en,DIG); fill(REV.en,PUN);
+  fill(REV.uk,UA); fill(REV.uk,DIG); fill(REV.uk,PUN);
+})();
+var GROUPS={
+  en:[['E','T','I','M'],['A','N','S','O'],['R','K','D','U'],['W','G','H','V'],['F','L','P','J','B'],['X','C','Y','Z','Q']],
+  uk:[['Е','Т','І','М'],['А','Н','С','О'],['Р','К','Д','У'],['В','Г','Х','Ж'],['Ф','Л','П','Й','Б'],['Ь','Ц','И','З','Ш'],['Є','Ї','Ч','Щ','Ю','Я']]
+};
+var WORDS={
+  en:['SOS','CAT','DOG','SUN','SEA','RADIO','MORSE','CODE','WATER','NIGHT','LIGHT','SHIP','FIRE','RIVER','STAR','WIND','SNOW','TREE','BOOK','HELP'],
+  uk:['КІТ','ДІМ','СОНЦЕ','ВОДА','МОРЕ','ЛІС','ДРУГ','НІЧ','ДЕНЬ','ХЛІБ','МАМА','ЗІРКА','РАДІО','МОРЗЕ','СИГНАЛ','РУКА','ВІТЕР','СНІГ','КНИГА','ВОГОНЬ']
+};
+var QUICK={en:['SOS','HELLO','THANKS','HELP','YES','NO','MORSE','73'],uk:['SOS','ПРИВІТ','ДЯКУЮ','ДОПОМОГА','ТАК','НІ','МОРЗЕ','73']};
+var LEVELS=[
+ {id:1,type:'m2l',g:1,n:8},{id:2,type:'m2l',g:2,n:10},{id:3,type:'l2m',g:2,n:10},
+ {id:4,type:'m2l',g:3,n:10},{id:5,type:'ear',g:2,n:10},{id:6,type:'key',g:2,n:8},
+ {id:7,type:'m2l',g:9,n:12},{id:8,type:'ear',g:4,n:12},{id:9,type:'word',n:8},
+ {id:10,type:'dig',n:10},{id:11,type:'earword',n:8},{id:12,type:'speed',n:15,wpm:20}
+];
+var I={
+ uk:{code:'УКР',brand:'МОРЗЕ',dec:'розшифровка',copy:'копію',copied:'ок!',clear:'стерти',
+  key:'КЛЮЧ',keyHint:'тап — крапка · утримуй — тире',
+  tabs:['Ключ','Текст','Тести','Таблиця'],
+  txtIn:'текст',txtOut:'морзе',quick:'швидкі фрази',play:'▶︎ Відтворити',stop:'■ Стоп',
+  letters:'літери',digits:'цифри',punct:'знаки',tips:'як вчити',
+  tipsTxt:'<b>1.</b> Починай із дерева: кожна крапка веде праворуч-вниз по гілці, кожне тире — на іншу гілку. Натисни літеру в дереві, щоб почути її.<br><b>2.</b> Вчи не картинку, а ритм: «ді» — крапка, «даа» — тире. Е = ді, Т = даа, А = ді-даа.<br><b>3.</b> По 4 літери за раз, далі тест. Слух важливіший за очі — рівні «на слух» не пропускай.<br><b>4.</b> Ґ звучить так само, як Г (--.), а в офіційній таблиці Ї збігається з І. Тут Ї = ·−−−·<br><b>5.</b> 10 хвилин щодня краще за годину раз на тиждень.',
+  langT:'мова',langHint:'Змінює і абетку, і мову інтерфейсу. Прогрес тестів зберігається окремо для кожної мови.',
+  sound:'звук',wpm:'Швидкість',freq:'Тон',keySnd:'Звук ключа',auto:'Авто-розділення літер',
+  home:'на екран «Домівка»',
+  homeTxt:'Відкрий це посилання в <b>Safari</b> → кнопка «Поділитися» ⬆︎ → <b>«На екран Домівка»</b>. Застосунок запуститься на весь екран, працює без інтернету після першого відкриття.',
+  prog:'прогрес',reset:'Скинути прогрес',resetQ:'Скинути весь прогрес?',
+  ask:{m2l:'яка це літера?',dig:'яка це цифра?',l2m:'обери код',ear:'слухай і обери',key:'відстукай на ключі',word:'що це за слово?',earword:'слухай слово',speed:'швидко!'},
+  replay:'↻ ще раз',result:'Результат',again:'Ще раз',next:'Наступний рівень',back:'До рівнів',locked:'спочатку пройди попередній',best:'рекорд',
+  lv:['Перші чотири','Вісім літер','Навпаки: літера → код','Дванадцять літер','На слух','На ключі','Уся абетка','На слух: більше','Слова','Цифри','Слова на слух','Швидкість 20 WPM']},
+ en:{code:'ENG',brand:'MORSE',dec:'decoded',copy:'copy',copied:'ok!',clear:'clear',
+  key:'KEY',keyHint:'tap — dot · hold — dash',
+  tabs:['Key','Text','Tests','Chart'],
+  txtIn:'text',txtOut:'morse',quick:'quick phrases',play:'▶︎ Play',stop:'■ Stop',
+  letters:'letters',digits:'digits',punct:'punctuation',tips:'how to learn',
+  tipsTxt:'<b>1.</b> Start with the tree: every dot follows one branch, every dash the other. Tap any letter to hear it.<br><b>2.</b> Learn the rhythm, not the picture: «di» is a dot, «dah» is a dash. E = di, T = dah, A = di-dah.<br><b>3.</b> Four letters at a time, then a test. Sound beats sight — never skip the «by ear» levels.<br><b>4.</b> Keep the speed at 12–15 WPM and raise the tone if it is hard to hear.<br><b>5.</b> Ten minutes a day beats one hour a week.',
+  langT:'language',langHint:'Switches both the alphabet and the interface. Test progress is stored per language.',
+  sound:'sound',wpm:'Speed',freq:'Tone',keySnd:'Key sidetone',auto:'Auto letter break',
+  home:'add to home screen',
+  homeTxt:'Open this link in <b>Safari</b> → Share ⬆︎ → <b>Add to Home Screen</b>. It launches full screen and works offline after the first load.',
+  prog:'progress',reset:'Reset progress',resetQ:'Reset all progress?',
+  ask:{m2l:'which letter?',dig:'which digit?',l2m:'pick the code',ear:'listen and pick',key:'tap it on the key',word:'which word?',earword:'listen to the word',speed:'fast!'},
+  replay:'↻ again',result:'Result',again:'Retry',next:'Next level',back:'Levels',locked:'finish the previous level',best:'best',
+  lv:['First four','Eight letters','Reverse: letter → code','Twelve letters','By ear','On the key','Whole alphabet','By ear: more','Words','Digits','Words by ear','Speed run 20 WPM']}
+};
+/* ============ STATE ============ */
+var S={lang:'uk',wpm:12,freq:600,snd:true,auto:true};
+var BUF='', OUT='', PROG={};
+try{ var sv=localStorage.getItem('morse.set'); if(sv){ var o=JSON.parse(sv); for(var k in o) S[k]=o[k]; } }catch(e){}
+function save(){ try{ localStorage.setItem('morse.set',JSON.stringify(S)); }catch(e){} }
+function loadProg(){ try{ PROG=JSON.parse(localStorage.getItem('morse.prog.'+S.lang)||'{}'); }catch(e){ PROG={}; } }
+function saveProg(){ try{ localStorage.setItem('morse.prog.'+S.lang,JSON.stringify(PROG)); }catch(e){} }
+function L(){ return I[S.lang]; }
+function MAP(){ return S.lang==='uk'?UA:EN; }
+function alphabet(){ var a=[],k; for(k in MAP()) if(!(S.lang==='uk'&&k==='Ґ')) a.push(k); return a; }
+function unit(){ return 1200/S.wpm; }
+function dec(c){ return REV[S.lang][c]||''; }
+var $=function(s){ return document.querySelector(s); };
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function glyphs(code,cls){ var h='<span class="gs '+(cls||'')+'">',i; for(i=0;i<code.length;i++) h+='<span class="g '+(code[i]==='.'?'d':'h')+'"></span>'; return h+'</span>'; }
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuf(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t; } return a; }
+/* ============ AUDIO ============ */
+var ac=null, kOsc=null, kGain=null, pOsc=null, pTimers=[], playing=false;
+function AC(){ try{ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); }catch(e){ ac=null; } return ac; }
+function toneOn(){ var c=AC(); if(!c) return; toneOff();
+  kOsc=c.createOscillator(); kGain=c.createGain(); kOsc.type='sine'; kOsc.frequency.value=S.freq;
+  kGain.gain.setValueAtTime(0,c.currentTime); kGain.gain.linearRampToValueAtTime(.22,c.currentTime+.008);
+  kOsc.connect(kGain); kGain.connect(c.destination); kOsc.start();
+}
+function toneOff(){ if(!kOsc||!ac) return; var t=ac.currentTime,g=kGain,o=kOsc;
+  try{ g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value,t); g.gain.linearRampToValueAtTime(0,t+.012); }catch(e){}
+  setTimeout(function(){ try{o.stop();o.disconnect();g.disconnect();}catch(e){} },80); kOsc=null; kGain=null;
+}
+function stopPlay(){ pTimers.forEach(clearTimeout); pTimers=[]; if(pOsc){ try{pOsc.o.stop();pOsc.o.disconnect();pOsc.g.disconnect();}catch(e){} pOsc=null; } playing=false; }
+function playText(txt,opt){
+  opt=opt||{}; stopPlay(); var c=AC(); if(!c){ if(opt.onDone)opt.onDone(); return; }
+  var u=(opt.unit||unit())/1000, t0=c.currentTime+.08, t=t0, i, s, d, code, marks=[], beeps=[];
+  txt=String(txt).toUpperCase();
+  for(i=0;i<txt.length;i++){
+    var ch=txt[i];
+    if(ch===' '||ch==='\n'){ t+=u*4; continue; }
+    code=ENC[ch]; if(!code) continue;
+    marks.push({t:t-t0,i:i});
+    for(var j=0;j<code.length;j++){ s=code[j]; d=(s==='.'?1:3)*u; beeps.push({t:t-t0,d:d}); t+=d+u; }
+    t+=u*2;
+  }
+  if(!beeps.length){ if(opt.onDone)opt.onDone(); return; }
+  var o=c.createOscillator(), g=c.createGain();
+  o.type='sine'; o.frequency.value=S.freq; g.gain.value=0; o.connect(g); g.connect(c.destination);
+  beeps.forEach(function(b){ var a=t0+b.t;
+    g.gain.setValueAtTime(0,a); g.gain.linearRampToValueAtTime(.22,a+.006);
+    g.gain.setValueAtTime(.22,a+b.d-.006); g.gain.linearRampToValueAtTime(0,a+b.d);
+  });
+  o.start(t0); o.stop(t+.08); pOsc={o:o,g:g}; playing=true;
+  if(opt.onBeep) beeps.forEach(function(b){
+    pTimers.push(setTimeout(function(){opt.onBeep(true);},b.t*1000+80));
+    pTimers.push(setTimeout(function(){opt.onBeep(false);},(b.t+b.d)*1000+80));
+  });
+  if(opt.onChar) marks.forEach(function(m){ pTimers.push(setTimeout(function(){opt.onChar(m.i);},m.t*1000+80)); });
+  pTimers.push(setTimeout(function(){ playing=false; stopPlay(); if(opt.onDone)opt.onDone(); },(t-t0)*1000+200));
+}
+/* ============ DECODER / KEY ============ */
+var tLet=null,tWord=null,keyDown=0,keyTarget=null;
+function clearT(){ clearTimeout(tLet); clearTimeout(tWord); }
+function push(sym){
+  if(keyTarget){ keyTarget.buf+=sym; keyTarget.render(); clearTimeout(keyTarget.t);
+    keyTarget.t=setTimeout(keyTarget.done,unit()*5); return; }
+  BUF+=sym; clearT(); renderBuf(); hiTree();
+  if(S.auto){ tLet=setTimeout(commitLetter,unit()*4.5); tWord=setTimeout(commitWord,unit()*10); }
+}
+function commitLetter(){ clearTimeout(tLet); if(BUF){ OUT+=(dec(BUF)||'¿'); BUF=''; renderOut(); renderBuf(); hiTree(); } }
+function commitWord(){ clearT(); commitLetter(); if(OUT && OUT.slice(-1)!==' '){ OUT+=' '; renderOut(); } }
+function del(){ clearT(); if(BUF){ BUF=BUF.slice(0,-1); renderBuf(); hiTree(); } else { OUT=OUT.slice(0,-1); renderOut(); } }
+function renderOut(){
+  var el=$('#out'); el.innerHTML = OUT? esc(OUT).replace(/ /g,'&nbsp;') : '<span class="ph">…</span>';
+  el.scrollTop=el.scrollHeight;
+}
+function renderBuf(){
+  $('#bufG').innerHTML = BUF? glyphs(BUF) : '';
+  var c=$('#bufC');
+  if(!BUF){ c.textContent=''; c.className='bufc'; }
+  else { var d=dec(BUF); c.textContent=d||'?'; c.className='bufc'+(d?'':' no'); }
+}
+/* ============ TREE ============ */
+var COL=56,ROWH=30,RAD=13,PX=14,PY=14;
+function buildTree(){
+  var map=MAP(), root={code:'',kids:{}}, ch,code,n,i;
+  for(ch in map){ code=map[ch]; n=root;
+    for(i=0;i<code.length;i++){ var s=code[i]; if(!n.kids[s]) n.kids[s]={code:n.code+s,kids:{}}; n=n.kids[s]; }
+    if(n.ch) n.alt=ch; else n.ch=ch;
+  }
+  return root;
+}
+function renderTree(){
+  var root=buildTree(), leaf=0, list=[];
+  (function w(n,d,p){ n.d=d; n.p=p; list.push(n);
+    var ks=[n.kids['.'],n.kids['-']].filter(Boolean);
+    if(!ks.length){ n.r=leaf++; }
+    else { ks.forEach(function(k){w(k,d+1,n);}); n.r=(ks[0].r+ks[ks.length-1].r)/2; }
+  })(root,0,null);
+  var maxD=0; list.forEach(function(n){ if(n.d>maxD) maxD=n.d; });
+  var W=PX*2+maxD*COL+RAD*2, H=PY*2+leaf*ROWH;
+  function X(n){ return PX+RAD+n.d*COL; } function Y(n){ return PY+(n.r+.5)*ROWH; }
+  var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">',i,n;
+  for(i=0;i<list.length;i++){ n=list[i]; if(!n.p) continue;
+    var px=X(n.p)+RAD, py=Y(n.p), cx=X(n)-RAD, cy=Y(n), mx=px+12, gx=(mx+cx)/2;
+    s+='<path class="ed" data-c="'+n.code+'" d="M'+px+' '+py+' H'+mx+' V'+cy+' H'+cx+'"/>';
+    s+= n.code.slice(-1)==='.'
+      ? '<circle class="sym" data-c="'+n.code+'" cx="'+gx+'" cy="'+cy+'" r="3"/>'
+      : '<rect class="sym" data-c="'+n.code+'" x="'+(gx-7)+'" y="'+(cy-2)+'" width="14" height="4" rx="2"/>';
+  }
+  for(i=0;i<list.length;i++){ n=list[i];
+    if(!n.p){ s+='<g class="rootg" transform="translate('+X(n)+','+Y(n)+')"><circle r="'+RAD+'" fill="#0e151e" stroke="#22303f"/><path d="M0,-7 V7 M-6,-10 L0,-4 L6,-10"/></g>'; continue; }
+    s+='<g class="nd'+(n.ch?' has':'')+'" data-c="'+n.code+'"><circle cx="'+X(n)+'" cy="'+Y(n)+'" r="'+RAD+'"/>'
+      +'<text x="'+X(n)+'" y="'+Y(n)+'" dy=".34em">'+(n.ch||'')+'</text></g>';
+  }
+  $('#treewrap').innerHTML=s+'</svg>';
+  hiTree();
+}
+function hiTree(){
+  var w=$('#treewrap'), els=w.querySelectorAll('[data-c]'), i, el, c, on=[];
+  for(i=0;i<BUF.length;i++) on.push(BUF.slice(0,i+1));
+  for(i=0;i<els.length;i++){ el=els[i]; c=el.getAttribute('data-c');
+    if(on.indexOf(c)>=0) el.classList.add('on'); else el.classList.remove('on');
+    if(el.classList.contains('nd')){ if(BUF && c===BUF) el.classList.add('cur'); else el.classList.remove('cur'); }
+  }
+  var cur=w.querySelector('.nd.cur');
+  if(cur){ var cy=+cur.querySelector('circle').getAttribute('cy');
+    try{ w.scrollTo({top:Math.max(0,cy-w.clientHeight/2),behavior:'smooth'}); }catch(e){ w.scrollTop=Math.max(0,cy-w.clientHeight/2); }
+  }
+}
+window.__M={S:S,ENC:ENC,REV:REV,MAP:MAP,LEVELS:LEVELS,GROUPS:GROUPS,UA:UA,EN:EN,DIG:DIG};
+/* ============ TEXT MODE ============ */
+function renderMout(){
+  var t=$('#txtIn').value.toUpperCase(), h='', i, ch, c;
+  for(i=0;i<t.length;i++){ ch=t[i];
+    if(ch===' '||ch==='\n'){ h+='<s> / </s>'; continue; }
+    c=ENC[ch];
+    h+= c? '<i data-i="'+i+'">'+c.replace(/\./g,'·').replace(/-/g,'−')+'</i> ' : '<s>·</s> ';
+  }
+  $('#mout').innerHTML=h||'<s>…</s>';
+}
+function playCurrent(){
+  if(playing){ stopPlay(); $('#playBtn').textContent=L().play; $('#led').classList.remove('on'); return; }
+  var txt=$('#txtIn').value; if(!txt.trim()) return;
+  $('#playBtn').textContent=L().stop;
+  playText(txt,{
+    onBeep:function(on){ $('#led').classList.toggle('on',on); },
+    onChar:function(i){
+      var all=$('#mout').querySelectorAll('i'),k;
+      for(k=0;k<all.length;k++) all[k].classList.toggle('hl',+all[k].getAttribute('data-i')===i);
+    },
+    onDone:function(){ $('#playBtn').textContent=L().play; $('#led').classList.remove('on');
+      var all=$('#mout').querySelectorAll('i'),k; for(k=0;k<all.length;k++) all[k].classList.remove('hl'); }
+  });
+}
+/* ============ CHART ============ */
+function cell(ch,code){ return '<button class="tc" data-code="'+code+'"><b>'+ch+'</b>'+glyphs(code,'sm')+'</button>'; }
+function renderChart(){
+  var map=MAP(), h='', k;
+  for(k in map) h+=cell(k+(S.lang==='uk'&&k==='Ґ'?'':''),map[k]);
+  $('#gLet').innerHTML=h;
+  h=''; for(k in DIG) h+=cell(k,DIG[k]); $('#gDig').innerHTML=h;
+  h=''; for(k in PUN) h+=cell(k==='&'?'&amp;':esc(k),PUN[k]); $('#gPun').innerHTML=h;
+  h=''; QUICK[S.lang].forEach(function(w){ h+='<button class="tc" data-say="'+w+'"><b style="font-size:13px">'+w+'</b></button>'; });
+  $('#quickGrid').innerHTML=h;
+}
+/* ============ TESTS ============ */
+var Q=null;
+function poolOf(lv){
+  if(lv.type==='dig') return Object.keys(DIG);
+  if(lv.type==='word'||lv.type==='earword') return WORDS[S.lang].slice();
+  var G=GROUPS[S.lang], g=Math.min(lv.g||99,G.length), a=[],i;
+  for(i=0;i<g;i++) a=a.concat(G[i]);
+  return a;
+}
+function stars(p){ return p>=.9?3:p>=.7?2:p>=.5?1:0; }
+function starHTML(n){ var h='',i; for(i=0;i<3;i++) h+='<i class="'+(i<n?'f':'')+'">★</i>'; return h; }
+function unlocked(idx){ if(idx===0) return true; var pv=PROG[LEVELS[idx-1].id]; return !!(pv&&pv>=.7); }
+function renderLevels(){
+  var h='',T=L();
+  LEVELS.forEach(function(lv,idx){
+    var ok=unlocked(idx), best=PROG[lv.id]||0, sub;
+    if(lv.type==='word'||lv.type==='earword') sub=WORDS[S.lang].slice(0,4).join(' · ');
+    else if(lv.type==='dig') sub='0 1 2 3 4 5 6 7 8 9';
+    else sub=poolOf(lv).slice(0,14).join(' ')+(poolOf(lv).length>14?' …':'');
+    if(!ok) sub=T.locked;
+    h+='<button class="lv'+(ok?'':' lock')+(best>=.7?' done':'')+'" data-lv="'+lv.id+'">'
+      +'<span class="lvn">'+(ok?lv.id:'🔒')+'</span>'
+      +'<span class="lvb"><span class="lvt">'+T.lv[idx]+'</span><span class="lvs">'+sub+'</span></span>'
+      +'<span class="stars">'+starHTML(stars(best))+'</span></button>';
+  });
+  $('#lvList').innerHTML=h;
+}
+function makeQs(lv){
+  var P=poolOf(lv), extra=alphabet(), qs=[], prev=null, i, a, o;
+  for(i=0;i<lv.n;i++){
+    var guard=0; do{ a=rnd(P); guard++; }while(P.length>2&&a===prev&&guard<20); prev=a;
+    o=shuf(P.filter(function(x){return x!==a;})).slice(0,3);
+    while(o.length<3){ var e=rnd(extra); if(e!==a&&o.indexOf(e)<0) o.push(e); }
+    qs.push({a:a,opts:shuf([a].concat(o))});
+  }
+  return qs;
+}
+function codeOf(x){ var c='',i; for(i=0;i<x.length;i++) c+=(ENC[x[i]]||'')+(i<x.length-1?' ':''); return c; }
+function startLevel(id){
+  var idx=0,i; for(i=0;i<LEVELS.length;i++) if(LEVELS[i].id===id) idx=i;
+  if(!unlocked(idx)) return;
+  Q={lv:LEVELS[idx],idx:idx,qs:makeQs(LEVELS[idx]),i:0,ok:0,answered:false};
+  $('#lvList').classList.add('hide'); $('#quiz').classList.remove('hide');
+  showQ();
+}
+function exitQuiz(){ stopPlay(); keyTarget=null; Q=null; $('#quiz').classList.add('hide'); $('#lvList').classList.remove('hide'); renderLevels(); }
+function sayLv(x,wpm){ playText(x,{unit:wpm?1200/wpm:undefined}); }
+function showQ(){
+  var q=Q.qs[Q.i], lv=Q.lv, t=lv.type, T=L(), body=$('#qBody'), opts=$('#qOpts'), h='';
+  Q.answered=false; keyTarget=null;
+  $('#qCount').textContent=(Q.i+1)+'/'+Q.qs.length;
+  $('#qBar').style.width=(Q.i/Q.qs.length*100)+'%';
+  var ask='<div class="qask">'+T.ask[t]+'</div>';
+  if(t==='m2l'||t==='dig'){
+    body.innerHTML=ask+'<div class="qmorse">'+glyphs(MAP()[q.a]||DIG[q.a],'lg')+'</div>';
+    opts.innerHTML=q.opts.map(function(x){return '<button class="opt" data-v="'+x+'">'+x+'</button>';}).join('');
+  } else if(t==='l2m'){
+    body.innerHTML=ask+'<div class="qbig">'+q.a+'</div>';
+    opts.innerHTML=q.opts.map(function(x){return '<button class="opt" data-v="'+x+'">'+glyphs(MAP()[x])+'</button>';}).join('');
+  } else if(t==='ear'||t==='speed'||t==='earword'){
+    body.innerHTML=ask+'<button class="spk" id="spk">🔊</button><div class="qask" id="rep">'+T.replay+'</div>';
+    opts.innerHTML=q.opts.map(function(x){return '<button class="opt'+(t==='earword'?' w':'')+'" data-v="'+x+'">'+x+'</button>';}).join('');
+    var sp=function(){ $('#spk').classList.add('on'); sayLv(q.a,lv.wpm); setTimeout(function(){ var e=$('#spk'); if(e)e.classList.remove('on'); },700); };
+    $('#spk').onclick=sp; setTimeout(sp,250);
+  } else if(t==='word'){
+    h=ask+'<div class="qmorse">';
+    for(var i=0;i<q.a.length;i++) h+=glyphs(MAP()[q.a[i]]||'','');
+    body.innerHTML=h+'</div>';
+    opts.innerHTML=q.opts.map(function(x){return '<button class="opt w" data-v="'+x+'">'+x+'</button>';}).join('');
+  } else if(t==='key'){
+    body.innerHTML=ask+'<div class="qbig">'+q.a+'</div><div class="qmorse" id="kq"></div>'
+      +'<button class="key" id="qkey" style="max-width:330px"><span class="kt">'+T.key+'</span><span class="ks">'+T.keyHint+'</span></button>';
+    opts.innerHTML='<button class="opt w" data-act="clr">⌫</button><button class="opt w" data-act="skip">→</button>';
+    bindKey($('#qkey'));
+    keyTarget={buf:'',t:null,render:function(){ $('#kq').innerHTML=glyphs(keyTarget.buf,'lg am'); },done:checkKey};
+  }
+}
+function markAll(){
+  var q=Q.qs[Q.i], els=$('#qOpts').querySelectorAll('.opt'),i;
+  for(i=0;i<els.length;i++) if(els[i].getAttribute('data-v')===q.a) els[i].classList.add('ok');
+}
+function answer(el,v){
+  if(!Q||Q.answered) return; Q.answered=true; keyTarget=null;
+  var q=Q.qs[Q.i], good=(v===q.a);
+  if(good){ Q.ok++; el&&el.classList.add('ok'); }
+  else { el&&el.classList.add('bad'); markAll(); }
+  setTimeout(nextQ,good?450:1200);
+}
+function checkKey(){
+  if(!Q||Q.answered) return;
+  var q=Q.qs[Q.i], got=keyTarget.buf, want=MAP()[q.a];
+  if(!got) return;
+  Q.answered=true; var good=(got===want);
+  $('#kq').innerHTML=glyphs(got,'lg')+(good?'':'<span style="margin-left:14px;opacity:.6">'+glyphs(want,'lg am')+'</span>');
+  $('#kq').style.color=good?'var(--acc)':'var(--red)';
+  var gl=$('#kq').querySelectorAll('.g'),i; for(i=0;i<gl.length;i++) gl[i].style.background=good?'var(--acc)':'var(--red)';
+  if(good) Q.ok++;
+  keyTarget=null;
+  setTimeout(nextQ,good?500:1300);
+}
+function skipKey(){
+  if(!Q||Q.answered) return; Q.answered=true;
+  var want=MAP()[Q.qs[Q.i].a], el=$('#kq');
+  if(el){ el.innerHTML=glyphs(want,'lg am'); }
+  keyTarget=null; setTimeout(nextQ,1100);
+}
+function nextQ(){ if(!Q) return; Q.i++; if(Q.i>=Q.qs.length) finish(); else showQ(); }
+function finish(){
+  var pct=Q.ok/Q.qs.length, T=L(), idx=Q.idx, lv=Q.lv;
+  if(!PROG[lv.id]||PROG[lv.id]<pct){ PROG[lv.id]=pct; saveProg(); }
+  $('#qBar').style.width='100%';
+  $('#qBody').innerHTML='<div class="res"><div class="qask">'+T.result+'</div>'
+    +'<div class="pc">'+Math.round(pct*100)+'%</div>'
+    +'<div class="stars" style="font-size:24px">'+starHTML(stars(pct))+'</div>'
+    +'<div class="qask">'+Q.ok+' / '+Q.qs.length+'</div></div>';
+  var hasNext=(idx+1<LEVELS.length)&&pct>=.7;
+  $('#qOpts').innerHTML='<button class="opt w" data-act="again">'+T.again+'</button>'
+    +'<button class="opt w" data-act="'+(hasNext?'next':'back')+'" style="background:var(--acc);color:#05230f;border-color:var(--acc)">'
+    +(hasNext?T.next:T.back)+'</button>';
+  Q.done=true;
+}
+/* ============ KEY BINDING ============ */
+function bindKey(el){
+  if(!el) return;
+  el.addEventListener('pointerdown',function(e){ e.preventDefault(); if(keyDown) return;
+    keyDown=performance.now(); if(S.snd) toneOn(); el.classList.add('on');
+    if(keyTarget) clearTimeout(keyTarget.t); else clearT(); },{passive:false});
+  var up=function(e){ if(!keyDown) return; var d=performance.now()-keyDown; keyDown=0; toneOff();
+    el.classList.remove('on'); push(d<unit()*2?'.':'-'); };
+  el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up); el.addEventListener('pointerleave',up);
+}
+/* ============ LANG / UI ============ */
+function applyLang(){
+  var T=L();
+  document.documentElement.lang=S.lang;
+  $('#brandTxt').textContent=T.brand; $('#langBtn').textContent=T.code;
+  $('#lblDec').textContent=T.dec; $('#copyBtn').textContent=T.copy; $('#clrBtn').textContent=T.clear;
+  $('#keyT').textContent=T.key; $('#keyS').textContent=T.keyHint;
+  ['tab1','tab2','tab3','tab4'].forEach(function(id,i){ $('#'+id).textContent=T.tabs[i]; });
+  $('#t_txtIn').textContent=T.txtIn; $('#t_txtOut').textContent=T.txtOut; $('#t_quick').textContent=T.quick;
+  $('#playBtn').textContent=playing?T.stop:T.play;
+  $('#t_letters').textContent=T.letters; $('#t_digits').textContent=T.digits; $('#t_punct').textContent=T.punct;
+  $('#t_tips').textContent=T.tips; $('#tipsTxt').innerHTML=T.tipsTxt;
+  $('#t_lang').textContent=T.langT; $('#langHint').innerHTML=T.langHint;
+  $('#t_sound').textContent=T.sound; $('#t_wpm').textContent=T.wpm; $('#t_freq').textContent=T.freq;
+  $('#t_key').textContent=T.keySnd; $('#t_auto').textContent=T.auto;
+  $('#t_home').textContent=T.home; $('#homeTxt').innerHTML=T.homeTxt;
+  $('#t_prog').textContent=T.prog; $('#resetBtn').textContent=T.reset;
+  var sl=$('#segLang').children,i; for(i=0;i<sl.length;i++) sl[i].classList.toggle('on',sl[i].getAttribute('data-l')===S.lang);
+  loadProg(); renderTree(); renderChart(); renderLevels(); renderMout(); renderBuf();
+}
+function showScreen(name){
+  var scr=document.querySelectorAll('.screen'),i;
+  for(i=0;i<scr.length;i++) scr[i].classList.toggle('on',scr[i].id==='sc-'+name);
+  var tb=$('#tabs').children; for(i=0;i<tb.length;i++) tb[i].classList.toggle('on',tb[i].getAttribute('data-s')===name);
+  $('#strip').classList.toggle('hide',name!=='key');
+  $('#setBtn').classList.toggle('on',name==='set');
+  if(name!=='test'&&Q) exitQuiz();
+  if(name!=='text'&&playing){ stopPlay(); $('#playBtn').textContent=L().play; $('#led').classList.remove('on'); }
+}
+/* ============ WIRE ============ */
+function init(){
+  document.addEventListener('pointerdown',function(){ AC(); },true);
+  bindKey($('#key'));
+  $('#bDot').onclick=function(){ AC(); blip('.'); push('.'); };
+  $('#bDash').onclick=function(){ AC(); blip('-'); push('-'); };
+  $('#bLet').onclick=function(){ commitLetter(); };
+  $('#bSpc').onclick=function(){ commitWord(); };
+  $('#bDel').onclick=del;
+  $('#clrBtn').onclick=function(){ clearT(); OUT=''; BUF=''; renderOut(); renderBuf(); hiTree(); };
+  $('#copyBtn').onclick=function(){ var t=OUT+(BUF?dec(BUF)||'':''); if(!t) return;
+    try{ navigator.clipboard.writeText(t).then(function(){ var b=$('#copyBtn'); b.textContent=L().copied; setTimeout(function(){b.textContent=L().copy;},1200); }).catch(function(){}); }catch(e){} };
+  $('#treewrap').addEventListener('click',function(e){
+    var el=e.target.closest? e.target.closest('[data-c]') : null; if(!el) return;
+    var c=el.getAttribute('data-c'); if(!c) return;
+    clearT(); BUF=c; renderBuf(); hiTree(); playText(dec(c)||'',{});
+  });
+  $('#langBtn').onclick=function(){ S.lang=S.lang==='uk'?'en':'uk'; save(); applyLang(); };
+  $('#setBtn').onclick=function(){ showScreen($('#sc-set').classList.contains('on')?'key':'set'); };
+  var tb=$('#tabs').children,i;
+  for(i=0;i<tb.length;i++) tb[i].onclick=(function(n){ return function(){ showScreen(n); }; })(tb[i].getAttribute('data-s'));
+  $('#txtIn').addEventListener('input',renderMout);
+  $('#playBtn').onclick=playCurrent;
+  document.addEventListener('click',function(e){
+    var t=e.target.closest? e.target.closest('[data-code],[data-say],[data-lv],[data-v],[data-act]') : null;
+    if(!t) return;
+    if(t.hasAttribute('data-code')) return playText(dec(t.getAttribute('data-code'))||'',{});
+    if(t.hasAttribute('data-say')){ $('#txtIn').value=t.getAttribute('data-say'); renderMout(); showScreen('text'); return playCurrent(); }
+    if(t.hasAttribute('data-lv')) return startLevel(+t.getAttribute('data-lv'));
+    if(t.hasAttribute('data-v')) return answer(t,t.getAttribute('data-v'));
+    if(t.hasAttribute('data-act')){
+      var a=t.getAttribute('data-act');
+      if(a==='clr'&&keyTarget){ keyTarget.buf=''; keyTarget.render(); clearTimeout(keyTarget.t); }
+      else if(a==='skip'){ skipKey(); }
+      else if(a==='again'){ startLevel(Q.lv.id); }
+      else if(a==='next'){ var n=LEVELS[Q.idx+1]; exitQuiz(); startLevel(n.id); }
+      else if(a==='back'){ exitQuiz(); }
+    }
+  });
+  $('#qExit').onclick=exitQuiz;
+  $('#segLang').onclick=function(e){ var b=e.target.closest('button'); if(!b) return; S.lang=b.getAttribute('data-l'); save(); applyLang(); };
+  var rw=$('#rWpm'), rf=$('#rFreq');
+  rw.value=S.wpm; rf.value=S.freq; $('#vWpm').textContent=S.wpm+' WPM'; $('#vFreq').textContent=S.freq+' Hz';
+  rw.oninput=function(){ S.wpm=+rw.value; $('#vWpm').textContent=S.wpm+' WPM'; save(); };
+  rf.oninput=function(){ S.freq=+rf.value; $('#vFreq').textContent=S.freq+' Hz'; save(); };
+  $('#swSnd').classList.toggle('on',!!S.snd); $('#swAuto').classList.toggle('on',!!S.auto);
+  $('#swSnd').onclick=function(){ S.snd=!S.snd; this.classList.toggle('on',S.snd); save(); };
+  $('#swAuto').onclick=function(){ S.auto=!S.auto; this.classList.toggle('on',S.auto); save(); };
+  $('#resetBtn').onclick=function(){ PROG={}; saveProg(); renderLevels(); this.textContent='✓'; var b=this; setTimeout(function(){b.textContent=L().reset;},1000); };
+  document.addEventListener('gesturestart',function(e){e.preventDefault();});
+  applyLang(); renderOut(); showScreen('key');
+}
+function blip(sym){ if(!S.snd) return; toneOn(); setTimeout(toneOff,(sym==='.'?1:3)*unit()); }
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){
+  try{navigator.serviceWorker.register('sw.js');}catch(e){}});}
+</script>
+</body>
+</html>
