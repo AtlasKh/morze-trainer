@@ -124,8 +124,8 @@ main{flex:1 1 auto;position:relative;min-height:0}
 .lvn{width:34px;height:34px;flex:0 0 auto;border-radius:10px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--dim)}
 .lv.done .lvn{background:#143524;border-color:var(--accd);color:var(--acc)}
 .lvb{flex:1;min-width:0}
-.lvt{font-size:15px;font-weight:600}
-.lvs{font-size:12px;color:var(--dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvt{display:block;font-size:15px;font-weight:600;line-height:1.25}
+.lvs{display:block;font-size:12px;color:var(--dim);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stars{font-size:12px;letter-spacing:1px;color:#33475c}
 .stars i{font-style:normal}
 .stars i.f{color:var(--amber)}
@@ -155,7 +155,9 @@ main{flex:1 1 auto;position:relative;min-height:0}
 .opt.ok{background:#143c28;border-color:var(--acc);color:var(--acc)}
 .opt.bad{background:#3c1a18;border-color:var(--red);color:var(--red)}
 .opt.ok .g{background:var(--acc)}.opt.bad .g{background:var(--red)}
-.spk{width:116px;height:116px;border-radius:50%;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:44px}
+.spk{width:104px;height:104px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.spk svg{width:42px;height:42px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.spk.on{color:#05230f}
 .spk:active{background:var(--panel2)}
 .spk.on{background:#143c28;border-color:var(--acc)}
 .res{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:20px}
@@ -192,6 +194,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .seg button.on{background:var(--acc);color:#05230f}
 p.hint{font-size:13px;color:var(--dim);line-height:1.6;margin:8px 0 0}
 p.hint b{color:var(--txt)}
+/* ---------- koch ---------- */
+.lv.kch{background:linear-gradient(135deg,#132b20,#0f1a24);border-color:var(--accd)}
+.lv.kch .lvn{background:var(--acc);color:#05230f;border-color:var(--acc)}
+.kwrap{flex:1;display:flex;flex-direction:column;min-height:0}
+.kmid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;gap:12px;padding:10px 12px;min-height:0;overflow-y:auto}
+.kcard{flex-direction:column;gap:14px;min-height:250px}
+.kin{font:700 30px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.22em;color:var(--txt);min-height:34px}
+.kin s{color:#33475c;text-decoration:none}
+.kdiff{display:flex;flex-direction:column;gap:5px;align-items:center;font:600 19px/1.2 ui-monospace,monospace;letter-spacing:.2em;min-height:24px}
+.kdiff .ok{color:var(--acc)}.kdiff .bad{color:var(--red)}
+.kdiff .was{color:var(--dim);font-size:15px;letter-spacing:.2em}
+.kpad{flex:0 0 auto;padding:8px 10px 10px;background:var(--panel);border-top:1px solid var(--line)}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;margin-bottom:8px;max-height:30vh;overflow-y:auto}
+.kgrid button{height:46px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;font-size:19px;font-weight:700}
+.kgrid button:active{background:var(--acc);color:#05230f}
+.krow{display:flex;gap:6px}
+.krow .pb{height:46px}
+.krow .pb.go{background:var(--acc);color:#05230f;border-color:var(--acc);font-weight:700}
+.krow .pb.go.off{background:var(--panel2);color:var(--dim);border-color:var(--line);font-weight:400}
 /* ---------- dictation ---------- */
 .dwrap{flex:1;display:flex;flex-direction:column;min-height:0}
 .dstrip{display:flex;gap:3px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--line);flex:0 0 auto;scrollbar-width:none}
@@ -322,6 +343,29 @@ nav button.on{color:var(--acc)}
   <!-- ======= TESTS ======= -->
   <section class="screen" id="sc-test">
     <div class="scroll" id="lvList"></div>
+    <div class="kwrap hide" id="koch">
+      <div class="qtop">
+        <button class="qx" id="kExit">✕</button>
+        <div class="bar"><i id="kBar" style="width:0"></i></div>
+        <span class="lbl" id="kCount">0/0</span>
+      </div>
+      <div class="kmid">
+        <div class="qask" id="kAsk"></div>
+        <div class="qcard kcard">
+          <button class="spk" id="kSpk"><svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.6L12 18V6L7.6 9.5H4z"/><path d="M16 9.2a4 4 0 010 5.6"/><path d="M18.6 6.6a7.6 7.6 0 010 10.8"/></svg></button>
+          <div class="kin" id="kIn"></div>
+          <div class="kdiff" id="kDiff"></div>
+        </div>
+      </div>
+      <div class="kpad">
+        <div class="kgrid" id="kGrid"></div>
+        <div class="krow">
+          <button class="pb" id="kDel" style="max-width:70px">⌫</button>
+          <button class="pb" id="kAgain" style="max-width:70px">♪</button>
+          <button class="pb go off" id="kNext">→</button>
+        </div>
+      </div>
+    </div>
     <div class="qwrap hide" id="quiz">
       <div class="qtop">
         <button class="qx" id="qExit">✕</button>
@@ -355,8 +399,11 @@ nav button.on{color:var(--acc)}
       </div>
       <div class="card">
         <h3 id="t_sound">звук</h3>
-        <div class="row"><span class="rl" id="t_wpm">Швидкість</span><span class="rv" id="vWpm">12</span></div>
-        <input type="range" id="rWpm" min="6" max="28" step="1">
+        <div class="row"><span class="rl" id="t_cwpm">Швидкість знаку</span><span class="rv" id="vCwpm">18</span></div>
+        <input type="range" id="rCwpm" min="10" max="32" step="1">
+        <div class="row"><span class="rl" id="t_ewpm">Ефективна швидкість</span><span class="rv" id="vEwpm">10</span></div>
+        <input type="range" id="rEwpm" min="4" max="32" step="1">
+        <p class="hint" id="fHint"></p>
         <div class="row"><span class="rl" id="t_freq">Тон</span><span class="rv" id="vFreq">600 Hz</span></div>
         <input type="range" id="rFreq" min="350" max="1000" step="10">
         <div class="row"><span class="rl" id="t_key">Звук ключа</span><button class="sw on" id="swSnd"><i></i></button></div>
@@ -431,7 +478,12 @@ var I={
   letters:'літери',digits:'цифри',punct:'знаки',tips:'як вчити',
   tipsTxt:'<b>1.</b> Починай із дерева: кожна крапка веде праворуч-вниз по гілці, кожне тире — на іншу гілку. Натисни літеру в дереві, щоб почути її.<br><b>2.</b> Вчи не картинку, а ритм: «ді» — крапка, «даа» — тире. Е = ді, Т = даа, А = ді-даа.<br><b>3.</b> По 4 літери за раз, далі тест. Слух важливіший за очі — рівні «на слух» не пропускай.<br><b>4.</b> Ґ звучить так само, як Г (--.), а в офіційній таблиці Ї збігається з І. Тут Ї = ·−−−·<br><b>5.</b> 10 хвилин щодня краще за годину раз на тиждень.',
   langT:'мова',langHint:'Змінює і абетку, і мову інтерфейсу. Прогрес тестів зберігається окремо для кожної мови.',
-  sound:'звук',wpm:'Швидкість',freq:'Тон',keySnd:'Звук ключа',auto:'Авто-розділення літер',
+  sound:'звук',cwpm:'Швидкість знаку',ewpm:'Ефективна швидкість',freq:'Тон',keySnd:'Звук ключа',auto:'Авто-розділення літер',
+  fhint:'<b>Паузи Фарнсворта.</b> Сам знак звучить на повній швидкості (18–20 WPM), а паузи між літерами розтягнуті до ефективної. Мозок устигає впізнати мелодію цілком і не вчиться рахувати крапки. Піднімай ефективну швидкість, коли впевнено береш 90%; швидкість знаку не знижуй.',
+  koch:'Метод Коха',kochSub:'Слухай на робочій швидкості з першого дня',
+  klv:'Рівень',kgo:'Почати сеанс',kgroup:'група',knew:'Нова літера',kacc:'точність',
+  kneed:'90% — і додається нова літера',kdone:'Сеанс завершено',kyou:'ти',kwas:'було',
+  kmax:'Уся абетка пройдена!',kask:'запиши, що почув',kreset:'Скинути рівень Коха',
   home:'на екран «Домівка»',
   homeTxt:'Відкрий це посилання в <b>Safari</b> → кнопка «Поділитися» ⬆︎ → <b>«На екран Домівка»</b>. Застосунок запуститься на весь екран, працює без інтернету після першого відкриття.',
   prog:'прогрес',reset:'Скинути прогрес',resetQ:'Скинути весь прогрес?',
@@ -449,7 +501,12 @@ var I={
   letters:'letters',digits:'digits',punct:'punctuation',tips:'how to learn',
   tipsTxt:'<b>1.</b> Start with the tree: every dot follows one branch, every dash the other. Tap any letter to hear it.<br><b>2.</b> Learn the rhythm, not the picture: «di» is a dot, «dah» is a dash. E = di, T = dah, A = di-dah.<br><b>3.</b> Four letters at a time, then a test. Sound beats sight — never skip the «by ear» levels.<br><b>4.</b> Keep the speed at 12–15 WPM and raise the tone if it is hard to hear.<br><b>5.</b> Ten minutes a day beats one hour a week.',
   langT:'language',langHint:'Switches both the alphabet and the interface. Test progress is stored per language.',
-  sound:'sound',wpm:'Speed',freq:'Tone',keySnd:'Key sidetone',auto:'Auto letter break',
+  sound:'sound',cwpm:'Character speed',ewpm:'Effective speed',freq:'Tone',keySnd:'Key sidetone',auto:'Auto letter break',
+  fhint:'<b>Farnsworth timing.</b> Each character is sent at full speed (18–20 WPM) while the gaps between characters are stretched to the effective speed. You hear the whole melody of a letter and never learn to count dots. Raise the effective speed once you clear 90%; leave the character speed alone.',
+  koch:'Koch method',kochSub:'Listening at working speed from day one',
+  klv:'Level',kgo:'Start a run',kgroup:'group',knew:'New letter',kacc:'accuracy',
+  kneed:'hit 90% and a new letter is added',kdone:'Run finished',kyou:'you',kwas:'sent',
+  kmax:'Whole alphabet unlocked!',kask:'write down what you heard',kreset:'Reset Koch level',
   home:'add to home screen',
   homeTxt:'Open this link in <b>Safari</b> → Share ⬆︎ → <b>Add to Home Screen</b>. It launches full screen and works offline after the first load.',
   prog:'progress',reset:'Reset progress',resetQ:'Reset all progress?',
@@ -459,17 +516,34 @@ var I={
   lv:['First four','Eight letters','Reverse: letter → code','Twelve letters','By ear','On the key','Whole alphabet','By ear: more','Words','Digits','Words by ear','Speed run 20 WPM']}
 };
 /* ============ STATE ============ */
-var BUILD='2026-11-23 · 4';
-var S={lang:'uk',wpm:12,freq:600,snd:true,auto:true,dsnd:true};
+var BUILD='2026-11-23 · 5';
+var S={lang:'uk',cwpm:18,ewpm:10,freq:600,snd:true,auto:true,dsnd:true};
+var KOCH={
+ en:['K','M','R','S','U','A','P','T','L','O','W','I','N','J','E','F','Y','V','G','Q','Z','H','B','C','D','X'],
+ uk:['К','М','Р','С','У','А','П','Т','Л','О','В','І','Н','Й','Е','Ф','И','Ж','Г','Щ','З','Х','Б','Ц','Д','Ь','Ч','Ш','Ю','Я','Є','Ї']};
 var BUF='', OUT='', PROG={};
 try{ var sv=localStorage.getItem('morse.set'); if(sv){ var o=JSON.parse(sv); for(var k in o) S[k]=o[k]; } }catch(e){}
+if(S.wpm&&!o_has(S,'cwpm')){ S.ewpm=S.wpm; S.cwpm=Math.max(18,S.wpm); }
+function o_has(o,k){ return Object.prototype.hasOwnProperty.call(o,k)&&typeof o[k]==='number'; }
+S.cwpm=Math.min(32,Math.max(10,S.cwpm||18)); S.ewpm=Math.min(S.cwpm,Math.max(4,S.ewpm||10));
 function save(){ try{ localStorage.setItem('morse.set',JSON.stringify(S)); }catch(e){} }
 function loadProg(){ try{ PROG=JSON.parse(localStorage.getItem('morse.prog.'+S.lang)||'{}'); }catch(e){ PROG={}; } }
 function saveProg(){ try{ localStorage.setItem('morse.prog.'+S.lang,JSON.stringify(PROG)); }catch(e){} }
 function L(){ return I[S.lang]; }
 function MAP(){ return S.lang==='uk'?UA:EN; }
 function alphabet(){ var a=[],k; for(k in MAP()) if(!(S.lang==='uk'&&k==='Ґ')) a.push(k); return a; }
-function unit(){ return 1200/S.wpm; }
+/* element length comes from the character speed; the gaps come from the
+   effective (Farnsworth) speed: ARRL spacing, 19 spacing units per PARIS word */
+function unit(){ return 1200/S.cwpm; }
+function kunit(){ return 1200/Math.max(4,Math.min(S.ewpm,S.cwpm)); }
+function timing(o){
+  o=o||{};
+  var c=o.cwpm||S.cwpm, e=o.ewpm||(o.cwpm?o.cwpm:S.ewpm);
+  if(!(c>0)) c=18; if(!(e>0)) e=c; if(e>c) e=c;
+  var u=1200/c, ta=(60*c-37.2*e)/(c*e), g=ta/19*1000;
+  if(!(g>0)||g<u) g=u;
+  return {u:u,lg:3*g,wg:7*g};
+}
 function dec(c){ return REV[S.lang][c]||''; }
 var $=function(s){ return document.querySelector(s); };
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -491,15 +565,16 @@ function toneOff(){ if(!kOsc||!ac) return; var t=ac.currentTime,g=kGain,o=kOsc;
 function stopPlay(){ pTimers.forEach(clearTimeout); pTimers=[]; if(pOsc){ try{pOsc.o.stop();pOsc.o.disconnect();pOsc.g.disconnect();}catch(e){} pOsc=null; } playing=false; }
 function playText(txt,opt){
   opt=opt||{}; stopPlay(); var c=AC(); if(!c){ if(opt.onDone)opt.onDone(); return; }
-  var u=(opt.unit||unit())/1000, t0=c.currentTime+.08, t=t0, i, s, d, code, marks=[], beeps=[];
+  var T=timing(opt), u=T.u/1000, lg=T.lg/1000, wg=T.wg/1000;
+  var t0=c.currentTime+.08, t=t0, i, s, d, code, marks=[], beeps=[];
   txt=String(txt).toUpperCase();
   for(i=0;i<txt.length;i++){
     var ch=txt[i];
-    if(ch===' '||ch==='\n'){ t+=u*4; continue; }
+    if(ch===' '||ch==='\n'){ t+=(wg-lg); continue; }
     code=ENC[ch]; if(!code) continue;
     marks.push({t:t-t0,i:i});
     for(var j=0;j<code.length;j++){ s=code[j]; d=(s==='.'?1:3)*u; beeps.push({t:t-t0,d:d}); t+=d+u; }
-    t+=u*2;
+    t+=(lg-u);
   }
   if(!beeps.length){ if(opt.onDone)opt.onDone(); return; }
   var o=c.createOscillator(), g=c.createGain();
@@ -523,9 +598,9 @@ function push(sym){
   if(keyTarget){
     if(keyTarget.onSym){ keyTarget.onSym(sym); return; }
     keyTarget.buf+=sym; keyTarget.render(); clearTimeout(keyTarget.t);
-    keyTarget.t=setTimeout(keyTarget.done,unit()*5); return; }
+    keyTarget.t=setTimeout(keyTarget.done,kunit()*5); return; }
   BUF+=sym; clearT(); renderBuf(); hiTree();
-  if(S.auto){ tLet=setTimeout(commitLetter,unit()*4.5); tWord=setTimeout(commitWord,unit()*10); }
+  if(S.auto){ tLet=setTimeout(commitLetter,kunit()*4.5); tWord=setTimeout(commitWord,kunit()*10); }
 }
 function commitLetter(){ clearTimeout(tLet); if(BUF){ OUT+=(dec(BUF)||'¿'); BUF=''; renderOut(); renderBuf(); hiTree(); } }
 function commitWord(){ clearT(); commitLetter(); if(OUT && OUT.slice(-1)!==' '){ OUT+=' '; renderOut(); } }
@@ -651,7 +726,12 @@ function stars(p){ return p>=.9?3:p>=.7?2:p>=.5?1:0; }
 function starHTML(n){ var h='',i; for(i=0;i<3;i++) h+='<i class="'+(i<n?'f':'')+'">★</i>'; return h; }
 function unlocked(idx){ if(idx===0) return true; var pv=PROG[LEVELS[idx-1].id]; return !!(pv&&pv>=.7); }
 function renderLevels(){
-  var h='',T=L();
+  var h='',T=L(), kn=kochN(), kall=KOCH[S.lang].length,
+      kset=KOCH[S.lang].slice(0,kn).join(' ');
+  h+='<button class="lv kch" data-koch="1"><span class="lvn">K</span><span class="lvb">'
+    +'<span class="lvt">'+T.koch+' · '+T.klv+' '+kn+'/'+kall+'</span>'
+    +'<span class="lvs">'+kset+'</span></span><span class="stars">▶</span></button>'
+    +'<p class="hint" style="margin:-2px 0 12px">'+T.kochSub+' · '+Math.max(18,S.cwpm)+'/'+S.ewpm+' WPM</p>';
   LEVELS.forEach(function(lv,idx){
     var ok=unlocked(idx), best=PROG[lv.id]||0, sub;
     if(lv.type==='word'||lv.type==='earword') sub=WORDS[S.lang].slice(0,4).join(' · ');
@@ -684,7 +764,7 @@ function startLevel(id){
   showQ();
 }
 function exitQuiz(){ stopPlay(); keyTarget=null; Q=null; $('#quiz').classList.add('hide'); $('#lvList').classList.remove('hide'); renderLevels(); }
-function sayLv(x,wpm){ playText(x,{unit:wpm?1200/wpm:undefined}); }
+function sayLv(x,wpm){ playText(x,wpm?{cwpm:wpm,ewpm:wpm}:{}); }
 function showQ(){
   var q=Q.qs[Q.i], lv=Q.lv, t=lv.type, T=L(), body=$('#qBody'), opts=$('#qOpts'), h='';
   Q.answered=false; keyTarget=null;
@@ -698,7 +778,7 @@ function showQ(){
     body.innerHTML=ask+'<div class="qcard"><span class="qbig">'+q.a+'</span></div>';
     opts.innerHTML=q.opts.map(function(x){return '<button class="opt" data-v="'+x+'">'+glyphs(MAP()[x])+'</button>';}).join('');
   } else if(t==='ear'||t==='speed'||t==='earword'){
-    body.innerHTML=ask+'<div class="qcard"><button class="spk" id="spk">🔊</button></div><div class="qask" id="rep">'+T.replay+'</div>';
+    body.innerHTML=ask+'<div class="qcard"><button class="spk" id="spk"><svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.6L12 18V6L7.6 9.5H4z"/><path d="M16 9.2a4 4 0 010 5.6"/><path d="M18.6 6.6a7.6 7.6 0 010 10.8"/></svg></button></div><div class="qask" id="rep">'+T.replay+'</div>';
     opts.innerHTML=q.opts.map(function(x){return '<button class="opt'+(t==='earword'?' w':'')+'" data-v="'+x+'">'+x+'</button>';}).join('');
     var sp=function(){ $('#spk').classList.add('on'); sayLv(q.a,lv.wpm); setTimeout(function(){ var e=$('#spk'); if(e)e.classList.remove('on'); },700); };
     $('#spk').onclick=sp; setTimeout(sp,250);
@@ -759,6 +839,98 @@ function finish(){
     +'<button class="opt w" data-act="'+(hasNext?'next':'back')+'" style="background:var(--acc);color:#05230f;border-color:var(--acc)">'
     +(hasNext?T.next:T.back)+'</button>';
   Q.done=true;
+}
+/* ============ KOCH ============ */
+var KS=null, KGROUPS=5, KLEN=5;
+function kochKey(){ return 'morse.koch.'+S.lang; }
+function kochN(){
+  var n=2; try{ n=parseInt(localStorage.getItem(kochKey()),10)||2; }catch(e){}
+  return Math.max(2,Math.min(KOCH[S.lang].length,n));
+}
+function kochSet(n){ try{ localStorage.setItem(kochKey(),String(n)); }catch(e){} }
+function kochSpeed(){ return {cwpm:Math.max(18,S.cwpm),ewpm:Math.min(Math.max(18,S.cwpm),S.ewpm)}; }
+function kochStart(){
+  var set=KOCH[S.lang].slice(0,kochN()), gs=[], i, j, g;
+  for(i=0;i<KGROUPS;i++){ g=''; for(j=0;j<KLEN;j++) g+=rnd(set); gs.push(g); }
+  KS={set:set,gs:gs,gi:0,input:'',right:0,total:0,fin:false,checked:false};
+  var sp=$('#kSpk'); if(sp) sp.style.display='';
+  $('#lvList').classList.add('hide'); $('#quiz').classList.add('hide'); $('#koch').classList.remove('hide');
+  kochGrid(); kochGroup();
+}
+function kochExit(){ KS=null; stopPlay(); $('#koch').classList.add('hide'); $('#lvList').classList.remove('hide'); renderLevels(); }
+function kochGrid(){
+  $('#kGrid').innerHTML=KS.set.map(function(c){ return '<button data-k="'+c+'">'+c+'</button>'; }).join('');
+}
+function kochGroup(){
+  if(!KS) return;
+  KS.input=''; KS.checked=false;
+  $('#kDiff').innerHTML=''; $('#kAsk').textContent=L().kask;
+  kochRender(); kochPlay();
+}
+function kochPlay(){
+  if(!KS||KS.fin) return;
+  var sp=$('#kSpk'); sp.classList.add('on');
+  playText(KS.gs[KS.gi],{cwpm:kochSpeed().cwpm,ewpm:kochSpeed().ewpm,
+    onDone:function(){ var e=$('#kSpk'); if(e) e.classList.remove('on'); }});
+}
+function kochRender(){
+  if(!KS) return;
+  var h='',i;
+  for(i=0;i<KLEN;i++) h+= i<KS.input.length? esc(KS.input[i]) : '<s>·</s>';
+  $('#kIn').innerHTML=h;
+  $('#kCount').textContent=(KS.gi+1)+'/'+KGROUPS;
+  $('#kBar').style.width=(KS.gi/KGROUPS*100)+'%';
+  $('#kNext').classList.toggle('off',KS.input.length===0);
+}
+function kochType(c){
+  if(!KS||KS.fin||KS.checked||KS.input.length>=KLEN) return;
+  KS.input+=c; kochRender();
+}
+function kochCheck(){
+  if(!KS||KS.fin||KS.checked||!KS.input.length) return;
+  KS.checked=true;
+  var want=KS.gs[KS.gi], got=KS.input, T=L(), i, a='', b='', ok=0;
+  for(i=0;i<KLEN;i++){
+    var g=got[i]||'·', w=want[i], good=(g===w);
+    if(good) ok++;
+    a+='<span class="'+(good?'ok':'bad')+'">'+esc(g)+'</span>';
+    b+=esc(w);
+  }
+  KS.right+=ok; KS.total+=KLEN;
+  $('#kDiff').innerHTML='<span>'+a+'</span>'+(ok<KLEN?'<span class="was">'+T.kwas+': '+b+'</span>':'');
+  setTimeout(function(){
+    if(!KS) return;
+    KS.gi++;
+    if(KS.gi>=KGROUPS) kochFinish(); else kochGroup();
+  }, ok===KLEN?700:1600);
+}
+function kochFinish(){
+  if(!KS) return; KS.fin=true;
+  var T=L(), acc=KS.right/Math.max(1,KS.total), n=kochN(), all=KOCH[S.lang].length,
+      up=(acc>=.9&&n<all), note='';
+  if(up){ n++; kochSet(n); note='<div style="color:var(--acc);font-weight:700;margin-top:6px">'
+    +T.knew+': '+KOCH[S.lang][n-1]+'</div>'; }
+  else if(acc>=.9) note='<div style="color:var(--acc);margin-top:6px">'+T.kmax+'</div>';
+  else note='<div class="qask" style="margin-top:6px">'+T.kneed+'</div>';
+  var bar=$('#kBar'); bar.style.width='100%';
+  var sp=$('#kSpk'); if(sp){ sp.classList.remove('on'); sp.style.display='none'; }
+  $('#kAsk').textContent=T.kdone;
+  $('#kIn').innerHTML='<span style="color:var(--acc)">'+Math.round(acc*100)+'%</span>';
+  $('#kDiff').innerHTML='<span class="was">'+KS.right+' / '+KS.total+'</span>'+note;
+  $('#kGrid').innerHTML='';
+  document.querySelector('#koch .krow').innerHTML=
+    '<button class="pb" id="kRetry">'+T.again+'</button><button class="pb go" id="kBack">'+T.back+'</button>';
+  $('#kRetry').onclick=function(){ document.querySelector('#koch .krow').innerHTML=KROW; kochBind(); kochStart(); };
+  $('#kBack').onclick=function(){ document.querySelector('#koch .krow').innerHTML=KROW; kochBind(); kochExit(); };
+}
+var KROW='<button class="pb" id="kDel" style="max-width:70px">⌫</button>'
+  +'<button class="pb" id="kAgain" style="max-width:70px">♪</button>'
+  +'<button class="pb go off" id="kNext">→</button>';
+function kochBind(){
+  var d=$('#kDel'), a=$('#kAgain'), n=$('#kNext');
+  if(d) d.onclick=function(){ if(KS&&!KS.checked&&KS.input){ KS.input=KS.input.slice(0,-1); kochRender(); } };
+  if(a) a.onclick=kochPlay;
+  if(n) n.onclick=kochCheck;
 }
 /* ============ DICTATION ============ */
 var D=null, DROW='<button class="pb" id="dHear">♪</button><button class="pb" id="dSkip">⏭</button>';
@@ -852,7 +1024,7 @@ function bindKey(el){
     keyDown=performance.now(); if(S.snd) toneOn(); el.classList.add('on');
     if(keyTarget) clearTimeout(keyTarget.t); else clearT(); },{passive:false});
   var up=function(e){ if(!keyDown) return; var d=performance.now()-keyDown; keyDown=0; toneOff();
-    el.classList.remove('on'); push(d<unit()*2?'.':'-'); };
+    el.classList.remove('on'); push(d<kunit()*2?'.':'-'); };
   el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up); el.addEventListener('pointerleave',up);
 }
 /* ============ LANG / UI ============ */
@@ -871,7 +1043,8 @@ function applyLang(){
   $('#t_letters').textContent=T.letters; $('#t_digits').textContent=T.digits; $('#t_punct').textContent=T.punct;
   $('#t_tips').textContent=T.tips; $('#tipsTxt').innerHTML=T.tipsTxt;
   $('#t_lang').textContent=T.langT; $('#langHint').innerHTML=T.langHint;
-  $('#t_sound').textContent=T.sound; $('#t_wpm').textContent=T.wpm; $('#t_freq').textContent=T.freq;
+  $('#t_sound').textContent=T.sound; $('#t_cwpm').textContent=T.cwpm; $('#t_ewpm').textContent=T.ewpm;
+  $('#t_freq').textContent=T.freq; $('#fHint').innerHTML=T.fhint;
   $('#t_key').textContent=T.keySnd; $('#t_auto').textContent=T.auto;
   $('#t_home').textContent=T.home; $('#homeTxt').innerHTML=T.homeTxt;
   $('#t_prog').textContent=T.prog; $('#resetBtn').textContent=T.reset;
@@ -887,6 +1060,7 @@ function showScreen(name){
   $('#strip').classList.toggle('hide',name!=='key');
   $('#setBtn').classList.toggle('on',name==='set');
   if(name!=='test'&&Q) exitQuiz();
+  if(name!=='test'&&KS) kochExit();
   if(name!=='dict'){ if(keyTarget&&keyTarget.onSym) keyTarget=null; }
   else if(D&&!D.fin&&D.txt[D.i]!==' ') keyTarget={onSym:dictPush};
   if(name==='key') setTimeout(fitTree,30);
@@ -920,11 +1094,13 @@ function init(){
   $('#txtIn').addEventListener('input',renderMout);
   $('#playBtn').onclick=playCurrent;
   document.addEventListener('click',function(e){
-    var t=e.target.closest? e.target.closest('[data-code],[data-say],[data-dict],[data-lv],[data-v],[data-act]') : null;
+    var t=e.target.closest? e.target.closest('[data-code],[data-say],[data-dict],[data-lv],[data-koch],[data-k],[data-v],[data-act]') : null;
     if(!t) return;
     if(t.hasAttribute('data-code')) return playText(dec(t.getAttribute('data-code'))||'',{});
     if(t.hasAttribute('data-dict')){ $('#dictIn').value=t.getAttribute('data-dict'); return dictStart(); }
     if(t.hasAttribute('data-say')){ $('#txtIn').value=t.getAttribute('data-say'); renderMout(); showScreen('text'); return playCurrent(); }
+    if(t.hasAttribute('data-koch')) return kochStart();
+    if(t.hasAttribute('data-k')) return kochType(t.getAttribute('data-k'));
     if(t.hasAttribute('data-lv')) return startLevel(+t.getAttribute('data-lv'));
     if(t.hasAttribute('data-v')) return answer(t,t.getAttribute('data-v'));
     if(t.hasAttribute('data-act')){
@@ -936,12 +1112,21 @@ function init(){
       else if(a==='back'){ exitQuiz(); }
     }
   });
-  $('#qExit').onclick=exitQuiz;
+  $('#qExit').onclick=exitQuiz; $('#kExit').onclick=kochExit;
+  $('#kSpk').onclick=kochPlay; kochBind();
   $('#segLang').onclick=function(e){ var b=e.target.closest('button'); if(!b) return; S.lang=b.getAttribute('data-l'); save(); applyLang(); };
-  var rw=$('#rWpm'), rf=$('#rFreq');
-  rw.value=S.wpm; rf.value=S.freq; $('#vWpm').textContent=S.wpm+' WPM'; $('#vFreq').textContent=S.freq+' Hz';
-  rw.oninput=function(){ S.wpm=+rw.value; $('#vWpm').textContent=S.wpm+' WPM'; save(); };
-  rf.oninput=function(){ S.freq=+rf.value; $('#vFreq').textContent=S.freq+' Hz'; save(); };
+  var rc=$('#rCwpm'), re_=$('#rEwpm'), rf=$('#rFreq');
+  function spd(){
+    if(S.ewpm>S.cwpm) S.ewpm=S.cwpm;
+    rc.value=S.cwpm; re_.value=S.ewpm; rf.value=S.freq;
+    $('#vCwpm').textContent=S.cwpm+' WPM'; $('#vFreq').textContent=S.freq+' Hz';
+    $('#vEwpm').textContent=S.ewpm+' WPM'+(S.ewpm<S.cwpm?' ·  Farnsworth':'');
+    save(); renderLevels();
+  }
+  rc.oninput=function(){ S.cwpm=+rc.value; if(S.ewpm>S.cwpm) S.ewpm=S.cwpm; spd(); };
+  re_.oninput=function(){ S.ewpm=Math.min(+re_.value,S.cwpm); spd(); };
+  rf.oninput=function(){ S.freq=+rf.value; spd(); };
+  spd();
   $('#swSnd').classList.toggle('on',!!S.snd); $('#swAuto').classList.toggle('on',!!S.auto);
   $('#swSnd').onclick=function(){ S.snd=!S.snd; this.classList.toggle('on',S.snd); save(); };
   $('#swAuto').onclick=function(){ S.auto=!S.auto; this.classList.toggle('on',S.auto); save(); };
@@ -961,7 +1146,7 @@ function init(){
       Promise.all(jobs).then(done,done); setTimeout(done,2500);
     }catch(e){ done(); }
   };
-  $('#resetBtn').onclick=function(){ PROG={}; saveProg(); renderLevels(); this.textContent='✓'; var b=this; setTimeout(function(){b.textContent=L().reset;},1000); };
+  $('#resetBtn').onclick=function(){ PROG={}; saveProg(); kochSet(2); renderLevels(); this.textContent='✓'; var b=this; setTimeout(function(){b.textContent=L().reset;},1000); };
   document.addEventListener('gesturestart',function(e){e.preventDefault();});
   applyLang(); renderOut(); showScreen('key');
   [0,120,400,900].forEach(function(ms){ setTimeout(fitTree,ms); });
@@ -977,7 +1162,7 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
   if(!('serviceWorker' in navigator)) return;
   var had = !!navigator.serviceWorker.controller, reloaded = false;
   navigator.serviceWorker.addEventListener('controllerchange', function(){
-    if(!had || reloaded) return;      /* first install needs no reload */
+    if(!had || reloaded) return;
     reloaded = true; location.reload();
   });
   window.addEventListener('load', function(){

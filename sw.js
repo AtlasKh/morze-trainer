@@ -1,6 +1,6 @@
 // Network-first for the page itself, cache-first for static assets.
 // The old cache-first-for-everything worker could serve a stale index.html forever.
-const CACHE = 'morse-v4';
+const CACHE = 'morse-v5';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
