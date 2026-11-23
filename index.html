@@ -65,8 +65,8 @@ header{
 .g.h{width:22px;height:8px}
 .gs{display:inline-flex;align-items:center;gap:5px}
 .gs.sm .g.d{width:6px;height:6px}.gs.sm .g.h{width:16px;height:6px}
-.gs.lg .g.d{width:14px;height:14px}.gs.lg .g.h{width:40px;height:14px}
-.gs.lg{gap:9px}
+.gs.lg .g.d{width:18px;height:18px}.gs.lg .g.h{width:52px;height:18px}
+.gs.lg{gap:12px}
 .gs.am .g{background:var(--amber)}
 /* ---------- screens ---------- */
 main{flex:1 1 auto;position:relative;min-height:0}
@@ -90,7 +90,7 @@ main{flex:1 1 auto;position:relative;min-height:0}
 .sym.on{fill:var(--acc)}
 .rootg path{stroke:var(--acc);stroke-width:2;fill:none;stroke-linecap:round}
 /* ---------- keypad ---------- */
-.pad{flex:0 0 auto;padding:8px 12px calc(var(--bot) + 8px);background:var(--panel);border-top:1px solid var(--line)}
+.pad{flex:0 0 auto;padding:8px 12px 10px;background:var(--panel);border-top:1px solid var(--line)}
 .padrow{display:flex;gap:6px;margin-bottom:8px}
 .pb{
   flex:1;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
@@ -127,24 +127,33 @@ main{flex:1 1 auto;position:relative;min-height:0}
 .stars i{font-style:normal}
 .stars i.f{color:var(--amber)}
 .qwrap{flex:1;display:flex;flex-direction:column;min-height:0}
-.qtop{display:flex;align-items:center;gap:10px;padding:10px 12px 0}
-.bar{flex:1;height:5px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.qtop{display:flex;align-items:center;gap:12px;padding:12px 14px 0}
+.qx{width:34px;height:34px;flex:0 0 auto;border:1px solid var(--line);border-radius:50%;background:var(--panel2);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:15px}
+.qx:active{color:var(--txt)}
+.bar{flex:1;height:6px;background:var(--panel2);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .25s}
-.qbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;min-height:0}
+.qmid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  gap:22px;min-height:0;overflow-y:auto;padding:14px 0 calc(var(--bot) + 14px)}
+.qbody{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 16px;width:100%}
 .qask{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:center}
-.qbig{font-size:64px;font-weight:700;line-height:1}
-.qmorse{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;max-width:320px}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:420px;padding:0 12px calc(var(--bot) + 12px)}
+.qcard{
+  width:100%;max-width:330px;min-height:132px;background:var(--panel);border:1px solid var(--line);
+  border-radius:20px;display:flex;align-items:center;justify-content:center;padding:22px 18px
+}
+.qbig{font-size:72px;font-weight:700;line-height:1}
+.qmorse{display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center;align-items:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:420px;padding:0 14px}
 .opt{
-  min-height:62px;border:1px solid var(--line);background:var(--panel);border-radius:12px;
-  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;padding:8px
+  min-height:66px;border:1px solid var(--line);background:var(--panel);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;padding:8px
 }
 .opt.w{font-size:17px;letter-spacing:.04em}
 .opt:active{background:var(--panel2)}
 .opt.ok{background:#143c28;border-color:var(--acc);color:var(--acc)}
 .opt.bad{background:#3c1a18;border-color:var(--red);color:var(--red)}
 .opt.ok .g{background:var(--acc)}.opt.bad .g{background:var(--red)}
-.spk{width:92px;height:92px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:36px}
+.spk{width:116px;height:116px;border-radius:50%;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:44px}
+.spk:active{background:var(--panel2)}
 .spk.on{background:#143c28;border-color:var(--acc)}
 .res{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:20px}
 .res .pc{font-size:56px;font-weight:700;color:var(--acc)}
@@ -181,8 +190,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 p.hint{font-size:13px;color:var(--dim);line-height:1.6;margin:8px 0 0}
 p.hint b{color:var(--txt)}
 /* ---------- tabbar ---------- */
-nav{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:var(--bot)}
-nav button{flex:1;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:10px;letter-spacing:.03em}
+nav{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:max(var(--bot),10px)}
+nav button{flex:1;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim);font-size:11px;font-weight:500;line-height:1;letter-spacing:.01em}
 nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav button.on{color:var(--acc)}
 .hide{display:none!important}
@@ -254,12 +263,14 @@ nav button.on{color:var(--acc)}
     <div class="scroll" id="lvList"></div>
     <div class="qwrap hide" id="quiz">
       <div class="qtop">
-        <button class="mini" id="qExit">✕</button>
+        <button class="qx" id="qExit">✕</button>
         <div class="bar"><i id="qBar" style="width:0"></i></div>
         <span class="lbl" id="qCount">0/0</span>
       </div>
-      <div class="qbody" id="qBody"></div>
-      <div class="opts" id="qOpts"></div>
+      <div class="qmid">
+        <div class="qbody" id="qBody"></div>
+        <div class="opts" id="qOpts"></div>
+      </div>
     </div>
   </section>
 
@@ -586,24 +597,25 @@ function showQ(){
   $('#qBar').style.width=(Q.i/Q.qs.length*100)+'%';
   var ask='<div class="qask">'+T.ask[t]+'</div>';
   if(t==='m2l'||t==='dig'){
-    body.innerHTML=ask+'<div class="qmorse">'+glyphs(MAP()[q.a]||DIG[q.a],'lg')+'</div>';
+    body.innerHTML=ask+'<div class="qcard">'+glyphs(MAP()[q.a]||DIG[q.a],'lg')+'</div>';
     opts.innerHTML=q.opts.map(function(x){return '<button class="opt" data-v="'+x+'">'+x+'</button>';}).join('');
   } else if(t==='l2m'){
-    body.innerHTML=ask+'<div class="qbig">'+q.a+'</div>';
+    body.innerHTML=ask+'<div class="qcard"><span class="qbig">'+q.a+'</span></div>';
     opts.innerHTML=q.opts.map(function(x){return '<button class="opt" data-v="'+x+'">'+glyphs(MAP()[x])+'</button>';}).join('');
   } else if(t==='ear'||t==='speed'||t==='earword'){
-    body.innerHTML=ask+'<button class="spk" id="spk">🔊</button><div class="qask" id="rep">'+T.replay+'</div>';
+    body.innerHTML=ask+'<div class="qcard"><button class="spk" id="spk">🔊</button></div><div class="qask" id="rep">'+T.replay+'</div>';
     opts.innerHTML=q.opts.map(function(x){return '<button class="opt'+(t==='earword'?' w':'')+'" data-v="'+x+'">'+x+'</button>';}).join('');
     var sp=function(){ $('#spk').classList.add('on'); sayLv(q.a,lv.wpm); setTimeout(function(){ var e=$('#spk'); if(e)e.classList.remove('on'); },700); };
     $('#spk').onclick=sp; setTimeout(sp,250);
   } else if(t==='word'){
-    h=ask+'<div class="qmorse">';
+    h=ask+'<div class="qcard"><div class="qmorse">';
     for(var i=0;i<q.a.length;i++) h+=glyphs(MAP()[q.a[i]]||'','');
-    body.innerHTML=h+'</div>';
+    body.innerHTML=h+'</div></div>';
     opts.innerHTML=q.opts.map(function(x){return '<button class="opt w" data-v="'+x+'">'+x+'</button>';}).join('');
   } else if(t==='key'){
-    body.innerHTML=ask+'<div class="qbig">'+q.a+'</div><div class="qmorse" id="kq"></div>'
-      +'<button class="key" id="qkey" style="max-width:330px"><span class="kt">'+T.key+'</span><span class="ks">'+T.keyHint+'</span></button>';
+    body.innerHTML=ask+'<div class="qcard"><span class="qbig">'+q.a+'</span></div>'
+      +'<div class="qmorse" id="kq" style="min-height:22px"></div>'
+      +'<button class="key" id="qkey" style="max-width:330px;height:84px"><span class="kt">'+T.key+'</span><span class="ks">'+T.keyHint+'</span></button>';
     opts.innerHTML='<button class="opt w" data-act="clr">⌫</button><button class="opt w" data-act="skip">→</button>';
     bindKey($('#qkey'));
     keyTarget={buf:'',t:null,render:function(){ $('#kq').innerHTML=glyphs(keyTarget.buf,'lg am'); },done:checkKey};
