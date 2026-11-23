@@ -368,6 +368,11 @@ nav button.on{color:var(--acc)}
         <p class="hint" id="homeTxt"></p>
       </div>
       <div class="card">
+        <h3 id="t_ver">версія</h3>
+        <p class="hint" id="buildTxt"></p>
+        <button class="btn sec" id="updBtn" style="max-width:none;margin-top:10px">update</button>
+      </div>
+      <div class="card">
         <h3 id="t_prog">прогрес</h3>
         <button class="btn sec" id="resetBtn" style="max-width:none">reset</button>
       </div>
@@ -430,6 +435,7 @@ var I={
   home:'на екран «Домівка»',
   homeTxt:'Відкрий це посилання в <b>Safari</b> → кнопка «Поділитися» ⬆︎ → <b>«На екран Домівка»</b>. Застосунок запуститься на весь екран, працює без інтернету після першого відкриття.',
   prog:'прогрес',reset:'Скинути прогрес',resetQ:'Скинути весь прогрес?',
+  ver:'версія',upd:'Перевірити оновлення',updGo:'Оновлюю…',build:'збірка',
   ask:{m2l:'яка це літера?',dig:'яка це цифра?',l2m:'обери код',ear:'слухай і обери',key:'відстукай на ключі',word:'що це за слово?',earword:'слухай слово',speed:'швидко!'},
   replay:'↻ ще раз',result:'Результат',again:'Ще раз',next:'Наступний рівень',back:'До рівнів',locked:'спочатку пройди попередній',best:'рекорд',
   lv:['Перші чотири','Вісім літер','Навпаки: літера → код','Дванадцять літер','На слух','На ключі','Уся абетка','На слух: більше','Слова','Цифри','Слова на слух','Швидкість 20 WPM']},
@@ -447,11 +453,13 @@ var I={
   home:'add to home screen',
   homeTxt:'Open this link in <b>Safari</b> → Share ⬆︎ → <b>Add to Home Screen</b>. It launches full screen and works offline after the first load.',
   prog:'progress',reset:'Reset progress',resetQ:'Reset all progress?',
+  ver:'version',upd:'Check for updates',updGo:'Updating…',build:'build',
   ask:{m2l:'which letter?',dig:'which digit?',l2m:'pick the code',ear:'listen and pick',key:'tap it on the key',word:'which word?',earword:'listen to the word',speed:'fast!'},
   replay:'↻ again',result:'Result',again:'Retry',next:'Next level',back:'Levels',locked:'finish the previous level',best:'best',
   lv:['First four','Eight letters','Reverse: letter → code','Twelve letters','By ear','On the key','Whole alphabet','By ear: more','Words','Digits','Words by ear','Speed run 20 WPM']}
 };
 /* ============ STATE ============ */
+var BUILD='2026-11-23 · 4';
 var S={lang:'uk',wpm:12,freq:600,snd:true,auto:true,dsnd:true};
 var BUF='', OUT='', PROG={};
 try{ var sv=localStorage.getItem('morse.set'); if(sv){ var o=JSON.parse(sv); for(var k in o) S[k]=o[k]; } }catch(e){}
@@ -867,6 +875,8 @@ function applyLang(){
   $('#t_key').textContent=T.keySnd; $('#t_auto').textContent=T.auto;
   $('#t_home').textContent=T.home; $('#homeTxt').innerHTML=T.homeTxt;
   $('#t_prog').textContent=T.prog; $('#resetBtn').textContent=T.reset;
+  $('#t_ver').textContent=T.ver; $('#buildTxt').innerHTML='<b>'+T.build+' '+BUILD+'</b>';
+  $('#updBtn').textContent=T.upd;
   var sl=$('#segLang').children,i; for(i=0;i<sl.length;i++) sl[i].classList.toggle('on',sl[i].getAttribute('data-l')===S.lang);
   loadProg(); renderTree(); renderChart(); renderLevels(); renderMout(); renderBuf();
 }
@@ -937,6 +947,20 @@ function init(){
   $('#swAuto').onclick=function(){ S.auto=!S.auto; this.classList.toggle('on',S.auto); save(); };
   $('#swDsnd').classList.toggle('on',S.dsnd!==false);
   $('#swDsnd').onclick=function(){ S.dsnd=!S.dsnd; this.classList.toggle('on',S.dsnd); save(); };
+  $('#updBtn').onclick=function(){
+    var b=this; b.textContent=L().updGo;
+    var done=function(){ try{ location.reload(); }catch(e){} };
+    try{
+      var jobs=[];
+      if(window.caches&&caches.keys) jobs.push(caches.keys().then(function(ks){
+        return Promise.all(ks.map(function(k){ return caches.delete(k); })); }));
+      if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)
+        jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+          return Promise.all(rs.map(function(r){ return r.unregister(); })); }));
+      if(!jobs.length) return done();
+      Promise.all(jobs).then(done,done); setTimeout(done,2500);
+    }catch(e){ done(); }
+  };
   $('#resetBtn').onclick=function(){ PROG={}; saveProg(); renderLevels(); this.textContent='✓'; var b=this; setTimeout(function(){b.textContent=L().reset;},1000); };
   document.addEventListener('gesturestart',function(e){e.preventDefault();});
   applyLang(); renderOut(); showScreen('key');
@@ -948,8 +972,26 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 })();
 </script>
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',function(){
-  try{navigator.serviceWorker.register('sw.js');}catch(e){}});}
+/* service worker: register, keep it fresh, reload once when a new one takes over */
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  var had = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(!had || reloaded) return;      /* first install needs no reload */
+    reloaded = true; location.reload();
+  });
+  window.addEventListener('load', function(){
+    try{
+      navigator.serviceWorker.register('sw.js').then(function(reg){
+        reg.update();
+        setInterval(function(){ try{ reg.update(); }catch(e){} }, 1800000);
+        document.addEventListener('visibilitychange', function(){
+          if(!document.hidden){ try{ reg.update(); }catch(e){} }
+        });
+      }).catch(function(){});
+    }catch(e){}
+  });
+})();
 </script>
 </body>
 </html>
