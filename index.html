@@ -44,18 +44,18 @@ header{
 .chip:active{background:#1d2a39}
 .chip.on{border-color:var(--accd);color:var(--acc)}
 /* ---------- decode strip ---------- */
-.strip{margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.strip{margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:9px 12px 8px}
 .striphead{display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .lbl{font-size:10px;letter-spacing:.16em;color:var(--dim);flex:1;text-transform:uppercase}
 .mini{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:3px 8px}
 .mini:active{color:var(--acc);border-color:var(--accd)}
 .out{
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:22px; line-height:1.25;
-  min-height:30px; max-height:76px; overflow-y:auto; word-break:break-word; letter-spacing:.04em
+  min-height:28px; max-height:62px; overflow-y:auto; word-break:break-word; letter-spacing:.04em
 }
 .out .ph{color:#3c4c5e}
 .out .cur{color:var(--amber)}
-.bufrow{display:flex;align-items:center;gap:10px;margin-top:6px;min-height:20px}
+.bufrow{display:flex;align-items:center;gap:10px;margin-top:5px;min-height:18px}
 .bufg{display:flex;align-items:center;gap:5px;min-height:14px;flex:1;flex-wrap:wrap}
 .bufc{font-size:15px;font-weight:700;color:var(--acc);font-family:ui-monospace,monospace}
 .bufc.no{color:var(--red)}
@@ -76,6 +76,9 @@ main{flex:1 1 auto;position:relative;min-height:0}
 /* ---------- tree ---------- */
 #treewrap{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 8px;min-height:0}
 #treewrap svg{display:block;margin:0 auto}
+.zoom{position:absolute;right:10px;top:6px;display:flex;gap:6px;z-index:3}
+.zoom button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:rgba(14,21,30,.9);color:var(--dim);font-size:16px;display:flex;align-items:center;justify-content:center}
+.zoom button:active{color:var(--acc);border-color:var(--accd)}
 .nd circle{fill:var(--panel2);stroke:var(--line);stroke-width:1.5}
 .nd text{fill:var(--dim);font:600 13px -apple-system,sans-serif;text-anchor:middle;dominant-baseline:central}
 .nd.has circle{fill:var(--panel2);stroke:#33475c}
@@ -132,8 +135,8 @@ main{flex:1 1 auto;position:relative;min-height:0}
 .qx:active{color:var(--txt)}
 .bar{flex:1;height:6px;background:var(--panel2);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .25s}
-.qmid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  gap:22px;min-height:0;overflow-y:auto;padding:14px 0 calc(var(--bot) + 14px)}
+.qmid{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;
+  gap:18px;min-height:0;overflow-y:auto;padding:10px 0 calc(var(--bot) + 10px)}
 .qbody{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 16px;width:100%}
 .qask{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:center}
 .qcard{
@@ -189,10 +192,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .seg button.on{background:var(--acc);color:#05230f}
 p.hint{font-size:13px;color:var(--dim);line-height:1.6;margin:8px 0 0}
 p.hint b{color:var(--txt)}
+/* ---------- dictation ---------- */
+.dwrap{flex:1;display:flex;flex-direction:column;min-height:0}
+.dstrip{display:flex;gap:3px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--line);flex:0 0 auto;scrollbar-width:none}
+.dstrip::-webkit-scrollbar{display:none}
+.dch{flex:0 0 auto;font:600 21px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:#44596e;padding:2px 5px;border-radius:7px;transition:.12s}
+.dch.done{color:var(--acc)}
+.dch.cur{background:var(--acc);color:#05230f}
+.dch.sp{width:12px}
+.dmid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;gap:12px;padding:10px 12px;min-height:0;overflow-y:auto}
+.dcard{flex-direction:column;gap:16px;min-height:208px}
+.drh{font-size:16px;letter-spacing:.14em;color:var(--dim);font-weight:600;text-transform:uppercase;min-height:18px}
+.dletter{font-size:68px;font-weight:700;line-height:1}
+.dletter.sp{font-size:22px;letter-spacing:.1em;color:var(--dim)}
+.dcode{display:flex;gap:12px;align-items:center;min-height:20px}
+.dcode .g{background:#2b3c4e;transition:.1s}
+.dcode .g.lit{background:var(--acc);box-shadow:0 0 12px rgba(61,220,132,.5)}
+.dcode.err .g{background:var(--red)}
+.drow{display:flex;gap:8px}
+.drow .pb{width:66px;flex:0 0 auto}
+.dstat{display:flex;gap:18px;font-size:13px;color:var(--dim)}
+.dstat b{color:var(--txt);font-weight:600}
 /* ---------- tabbar ---------- */
-nav{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:max(var(--bot),10px)}
-nav button{flex:1;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim);font-size:11px;font-weight:500;line-height:1;letter-spacing:.01em}
-nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:calc(max(var(--bot),8px) + 8px)}
+nav button{flex:1;padding:8px 1px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:10.5px;font-weight:500;line-height:1.1;letter-spacing:0}
+nav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav button.on{color:var(--acc)}
 .hide{display:none!important}
 </style>
@@ -220,6 +244,7 @@ nav button.on{color:var(--acc)}
 <main>
   <!-- ======= KEY ======= -->
   <section class="screen on" id="sc-key">
+    <div class="zoom"><button id="zOut">−</button><button id="zIn">+</button></div>
     <div id="treewrap"></div>
     <div class="pad">
       <div class="padrow">
@@ -254,6 +279,42 @@ nav button.on{color:var(--acc)}
       <div class="card">
         <h3 id="t_quick">—</h3>
         <div class="tgrid" id="quickGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= DICTATION ======= -->
+  <section class="screen" id="sc-dict">
+    <div class="scroll" id="dSetup">
+      <div class="card">
+        <h3 id="t_dictIn">що відстукати</h3>
+        <textarea id="dictIn" rows="2" placeholder="SOS"></textarea>
+      </div>
+      <button class="btn" id="dStart" style="max-width:none;margin-bottom:10px">Почати</button>
+      <div class="card"><h3 id="t_dquick">приклади</h3><div class="tgrid" id="dQuick"></div></div>
+      <div class="card"><p class="hint" id="dHint"></p></div>
+    </div>
+    <div class="dwrap hide" id="dPlay">
+      <div class="qtop">
+        <button class="qx" id="dExit">✕</button>
+        <div class="bar"><i id="dBar" style="width:0"></i></div>
+        <span class="lbl" id="dCount">0/0</span>
+      </div>
+      <div class="dstrip" id="dStrip"></div>
+      <div class="dmid">
+        <div class="qask" id="dAsk"></div>
+        <div class="qcard dcard">
+          <div class="dletter" id="dLetter"></div>
+          <div class="dcode" id="dCode"></div>
+          <div class="drh" id="dRh"></div>
+        </div>
+        <div class="drow">
+          <button class="pb" id="dHear">♪</button>
+          <button class="pb" id="dSkip">⏭</button>
+        </div>
+      </div>
+      <div class="pad">
+        <button class="key" id="dKey"><span class="kt" id="dKeyT">КЛЮЧ</span><span class="ks" id="dKeyS"></span></button>
       </div>
     </div>
   </section>
@@ -300,6 +361,7 @@ nav button.on{color:var(--acc)}
         <input type="range" id="rFreq" min="350" max="1000" step="10">
         <div class="row"><span class="rl" id="t_key">Звук ключа</span><button class="sw on" id="swSnd"><i></i></button></div>
         <div class="row"><span class="rl" id="t_auto">Авто-розділення літер</span><button class="sw on" id="swAuto"><i></i></button></div>
+        <div class="row"><span class="rl" id="t_dsnd">Підказка звуком</span><button class="sw on" id="swDsnd"><i></i></button></div>
       </div>
       <div class="card">
         <h3 id="t_home">на екран «Домівка»</h3>
@@ -316,8 +378,9 @@ nav button.on{color:var(--acc)}
 <nav id="tabs">
   <button data-s="key" class="on"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><rect x="10" y="10" width="10" height="4" rx="2"/></svg><span id="tab1">Ключ</span></button>
   <button data-s="text"><svg viewBox="0 0 24 24"><path d="M4 7V5h16v2M12 5v14M9 19h6"/></svg><span id="tab2">Текст</span></button>
-  <button data-s="test"><svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span id="tab3">Тести</span></button>
-  <button data-s="chart"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18M9 10v10"/></svg><span id="tab4">Таблиця</span></button>
+  <button data-s="dict"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg><span id="tab3">Диктант</span></button>
+  <button data-s="test"><svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span id="tab4">Тести</span></button>
+  <button data-s="chart"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18M9 10v10"/></svg><span id="tab5">Таблиця</span></button>
 </nav>
 </div>
 <script>
@@ -344,6 +407,8 @@ var WORDS={
   uk:['КІТ','ДІМ','СОНЦЕ','ВОДА','МОРЕ','ЛІС','ДРУГ','НІЧ','ДЕНЬ','ХЛІБ','МАМА','ЗІРКА','РАДІО','МОРЗЕ','СИГНАЛ','РУКА','ВІТЕР','СНІГ','КНИГА','ВОГОНЬ']
 };
 var QUICK={en:['SOS','HELLO','THANKS','HELP','YES','NO','MORSE','73'],uk:['SOS','ПРИВІТ','ДЯКУЮ','ДОПОМОГА','ТАК','НІ','МОРЗЕ','73']};
+var PHRASES={en:['SOS','HELLO','MORSE','THANK YOU','HOW ARE YOU','I HEAR YOU','GOOD NIGHT','73'],
+  uk:['SOS','ПРИВІТ','МОРЗЕ','ДЯКУЮ','ДОБРИЙ ДЕНЬ','Я ТЕБЕ ЧУЮ','НА ЗВ ЯЗКУ','73']};
 var LEVELS=[
  {id:1,type:'m2l',g:1,n:8},{id:2,type:'m2l',g:2,n:10},{id:3,type:'l2m',g:2,n:10},
  {id:4,type:'m2l',g:3,n:10},{id:5,type:'ear',g:2,n:10},{id:6,type:'key',g:2,n:8},
@@ -353,7 +418,10 @@ var LEVELS=[
 var I={
  uk:{code:'УКР',brand:'МОРЗЕ',dec:'розшифровка',copy:'копію',copied:'ок!',clear:'стерти',
   key:'КЛЮЧ',keyHint:'тап — крапка · утримуй — тире',
-  tabs:['Ключ','Текст','Тести','Таблиця'],
+  tabs:['Ключ','Текст','Диктант','Тести','Таблиця'],
+  dictIn:'що відстукати',dstart:'▶︎ Почати',dquick:'приклади',
+  dhint:'Напиши слово або речення — застосунок проведе тебе по ньому літера за літерою, як караоке. Тисни на ключ: тап — крапка, утримання — тире. Крапки й тире загоряються по черзі; помилився — літера починається спочатку. ♪ програє поточну літеру, ⏭ пропускає її.',
+  dask:'відстукай на ключі',dit:'ді',dah:'даа',dsp:'ПРОБІЛ',ddone:'Готово!',dtime:'час',derr:'помилки',dacc:'точність',dagain:'Ще раз',dnew:'Інша фраза',dsnd:'Підказка звуком',
   txtIn:'текст',txtOut:'морзе',quick:'швидкі фрази',play:'▶︎ Відтворити',stop:'■ Стоп',
   letters:'літери',digits:'цифри',punct:'знаки',tips:'як вчити',
   tipsTxt:'<b>1.</b> Починай із дерева: кожна крапка веде праворуч-вниз по гілці, кожне тире — на іншу гілку. Натисни літеру в дереві, щоб почути її.<br><b>2.</b> Вчи не картинку, а ритм: «ді» — крапка, «даа» — тире. Е = ді, Т = даа, А = ді-даа.<br><b>3.</b> По 4 літери за раз, далі тест. Слух важливіший за очі — рівні «на слух» не пропускай.<br><b>4.</b> Ґ звучить так само, як Г (--.), а в офіційній таблиці Ї збігається з І. Тут Ї = ·−−−·<br><b>5.</b> 10 хвилин щодня краще за годину раз на тиждень.',
@@ -367,7 +435,10 @@ var I={
   lv:['Перші чотири','Вісім літер','Навпаки: літера → код','Дванадцять літер','На слух','На ключі','Уся абетка','На слух: більше','Слова','Цифри','Слова на слух','Швидкість 20 WPM']},
  en:{code:'ENG',brand:'MORSE',dec:'decoded',copy:'copy',copied:'ok!',clear:'clear',
   key:'KEY',keyHint:'tap — dot · hold — dash',
-  tabs:['Key','Text','Tests','Chart'],
+  tabs:['Key','Text','Dictate','Tests','Chart'],
+  dictIn:'what to tap',dstart:'▶︎ Start',dquick:'examples',
+  dhint:'Type a word or a sentence — the app walks you through it letter by letter, karaoke style. Tap the key: tap for a dot, hold for a dash. The dots and dashes light up as you go; a wrong symbol restarts the letter. ♪ replays the current letter, ⏭ skips it.',
+  dask:'tap it on the key',dit:'di',dah:'dah',dsp:'SPACE',ddone:'Done!',dtime:'time',derr:'errors',dacc:'accuracy',dagain:'Again',dnew:'New phrase',dsnd:'Play each letter',
   txtIn:'text',txtOut:'morse',quick:'quick phrases',play:'▶︎ Play',stop:'■ Stop',
   letters:'letters',digits:'digits',punct:'punctuation',tips:'how to learn',
   tipsTxt:'<b>1.</b> Start with the tree: every dot follows one branch, every dash the other. Tap any letter to hear it.<br><b>2.</b> Learn the rhythm, not the picture: «di» is a dot, «dah» is a dash. E = di, T = dah, A = di-dah.<br><b>3.</b> Four letters at a time, then a test. Sound beats sight — never skip the «by ear» levels.<br><b>4.</b> Keep the speed at 12–15 WPM and raise the tone if it is hard to hear.<br><b>5.</b> Ten minutes a day beats one hour a week.',
@@ -381,7 +452,7 @@ var I={
   lv:['First four','Eight letters','Reverse: letter → code','Twelve letters','By ear','On the key','Whole alphabet','By ear: more','Words','Digits','Words by ear','Speed run 20 WPM']}
 };
 /* ============ STATE ============ */
-var S={lang:'uk',wpm:12,freq:600,snd:true,auto:true};
+var S={lang:'uk',wpm:12,freq:600,snd:true,auto:true,dsnd:true};
 var BUF='', OUT='', PROG={};
 try{ var sv=localStorage.getItem('morse.set'); if(sv){ var o=JSON.parse(sv); for(var k in o) S[k]=o[k]; } }catch(e){}
 function save(){ try{ localStorage.setItem('morse.set',JSON.stringify(S)); }catch(e){} }
@@ -441,7 +512,9 @@ function playText(txt,opt){
 var tLet=null,tWord=null,keyDown=0,keyTarget=null;
 function clearT(){ clearTimeout(tLet); clearTimeout(tWord); }
 function push(sym){
-  if(keyTarget){ keyTarget.buf+=sym; keyTarget.render(); clearTimeout(keyTarget.t);
+  if(keyTarget){
+    if(keyTarget.onSym){ keyTarget.onSym(sym); return; }
+    keyTarget.buf+=sym; keyTarget.render(); clearTimeout(keyTarget.t);
     keyTarget.t=setTimeout(keyTarget.done,unit()*5); return; }
   BUF+=sym; clearT(); renderBuf(); hiTree();
   if(S.auto){ tLet=setTimeout(commitLetter,unit()*4.5); tWord=setTimeout(commitWord,unit()*10); }
@@ -492,9 +565,21 @@ function renderTree(){
     s+='<g class="nd'+(n.ch?' has':'')+'" data-c="'+n.code+'"><circle cx="'+X(n)+'" cy="'+Y(n)+'" r="'+RAD+'"/>'
       +'<text x="'+X(n)+'" y="'+Y(n)+'" dy=".34em">'+(n.ch||'')+'</text></g>';
   }
+  treeW=W; treeH=H;
   $('#treewrap').innerHTML=s+'</svg>';
-  hiTree();
+  fitTree(); hiTree();
 }
+var treeW=0,treeH=0,treeK=1,treeZ=1;
+function fitTree(){
+  var w=$('#treewrap'); if(!w) return; var svg=w.querySelector('svg');
+  if(!svg||!treeW) return;
+  var cw=w.clientWidth-14, chh=w.clientHeight-10;
+  if(cw<60||chh<60) return;
+  var k=Math.min(cw/treeW,chh/treeH);
+  k=Math.min(Math.max(k,.38),1.3)*treeZ;
+  treeK=k; svg.style.width=(treeW*k)+'px'; svg.style.height=(treeH*k)+'px';
+}
+function zoomTree(d){ treeZ=Math.min(2.4,Math.max(.7,treeZ+d)); fitTree(); }
 function hiTree(){
   var w=$('#treewrap'), els=w.querySelectorAll('[data-c]'), i, el, c, on=[];
   for(i=0;i<BUF.length;i++) on.push(BUF.slice(0,i+1));
@@ -503,7 +588,7 @@ function hiTree(){
     if(el.classList.contains('nd')){ if(BUF && c===BUF) el.classList.add('cur'); else el.classList.remove('cur'); }
   }
   var cur=w.querySelector('.nd.cur');
-  if(cur){ var cy=+cur.querySelector('circle').getAttribute('cy');
+  if(cur){ var cy=(+cur.querySelector('circle').getAttribute('cy'))*treeK;
     try{ w.scrollTo({top:Math.max(0,cy-w.clientHeight/2),behavior:'smooth'}); }catch(e){ w.scrollTop=Math.max(0,cy-w.clientHeight/2); }
   }
 }
@@ -542,6 +627,8 @@ function renderChart(){
   h=''; for(k in PUN) h+=cell(k==='&'?'&amp;':esc(k),PUN[k]); $('#gPun').innerHTML=h;
   h=''; QUICK[S.lang].forEach(function(w){ h+='<button class="tc" data-say="'+w+'"><b style="font-size:13px">'+w+'</b></button>'; });
   $('#quickGrid').innerHTML=h;
+  h=''; PHRASES[S.lang].forEach(function(w){ h+='<button class="tc" data-dict="'+w+'"><b style="font-size:13px">'+w+'</b></button>'; });
+  $('#dQuick').innerHTML=h;
 }
 /* ============ TESTS ============ */
 var Q=null;
@@ -665,6 +752,91 @@ function finish(){
     +(hasNext?T.next:T.back)+'</button>';
   Q.done=true;
 }
+/* ============ DICTATION ============ */
+var D=null, DROW='<button class="pb" id="dHear">♪</button><button class="pb" id="dSkip">⏭</button>';
+function dRow(){ return document.querySelector('#dPlay .drow'); }
+function bindDRow(){
+  var h=$('#dHear'), k=$('#dSkip'), a=$('#dAgain'), n=$('#dNew');
+  if(h) h.onclick=function(){ if(D&&!D.fin&&D.txt[D.i]!==' ') playText(D.txt[D.i],{}); };
+  if(k) k.onclick=function(){ if(D&&!D.fin){ D.err++; D.hit++; dictNext(); } };
+  if(a) a.onclick=function(){ dictStart(); };
+  if(n) n.onclick=dictExit;
+}
+function dictStart(){
+  var t=$('#dictIn').value.toUpperCase().replace(/\s+/g,' ').trim(), i, tot=0;
+  if(!t) return;
+  for(i=0;i<t.length;i++) if(t[i]!==' '&&ENC[t[i]]) tot++;
+  if(!tot) return;
+  D={txt:t,i:-1,buf:'',err:0,hit:0,tot:tot,t0:Date.now(),fin:false};
+  $('#dSetup').classList.add('hide'); $('#dPlay').classList.remove('hide');
+  dRow().innerHTML=DROW; bindDRow();
+  var kp=$('#dKey'); if(kp&&kp.parentNode) kp.parentNode.classList.remove('hide');
+  dictNext();
+}
+function dictExit(){ D=null; keyTarget=null; stopPlay();
+  $('#dPlay').classList.add('hide'); $('#dSetup').classList.remove('hide'); }
+function dStrip(){
+  var h='',i,ch;
+  for(i=0;i<D.txt.length;i++){ ch=D.txt[i];
+    h+='<span class="dch'+(ch===' '?' sp':'')+(D.fin||i<D.i?' done':'')+(!D.fin&&i===D.i?' cur':'')+'">'
+      +(ch===' '?'':esc(ch))+'</span>';
+  }
+  $('#dStrip').innerHTML=h;
+  var c=$('#dStrip').querySelector('.cur');
+  if(c&&c.scrollIntoView){ try{ c.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}); }catch(e){} }
+}
+function dictNext(){
+  if(!D) return;
+  D.buf=''; D.i++;
+  while(D.i<D.txt.length && D.txt[D.i]!==' ' && !ENC[D.txt[D.i]]) D.i++;
+  if(D.i>=D.txt.length) return dictFinish();
+  dStrip(); dictRender();
+  var ch=D.txt[D.i];
+  if(ch===' '){ keyTarget=null; setTimeout(function(){ if(D&&!D.fin&&D.txt[D.i]===' ') dictNext(); },650); return; }
+  keyTarget={onSym:dictPush};
+  if(S.dsnd) setTimeout(function(){ if(D&&!D.fin&&D.txt[D.i]===ch&&!D.buf) playText(ch,{}); },180);
+}
+function dictRender(){
+  if(!D) return; var T=L(), ch=D.txt[D.i];
+  $('#dCount').textContent=D.hit+'/'+D.tot;
+  $('#dBar').style.width=(D.hit/D.tot*100)+'%';
+  if(ch===' '){ $('#dAsk').textContent=''; $('#dLetter').textContent=T.dsp;
+    $('#dLetter').className='dletter sp'; $('#dCode').innerHTML=''; $('#dRh').textContent=''; return; }
+  var code=ENC[ch], h='', r=[], i;
+  $('#dAsk').textContent=T.dask; $('#dLetter').textContent=ch; $('#dLetter').className='dletter';
+  for(i=0;i<code.length;i++){ h+='<span class="g '+(code[i]==='.'?'d':'h')+(i<D.buf.length?' lit':'')+'"></span>';
+    r.push(code[i]==='.'?T.dit:T.dah); }
+  $('#dCode').className='dcode'; $('#dCode').innerHTML=h; $('#dRh').textContent=r.join('-');
+}
+function dictPush(sym){
+  if(!D||D.fin) return;
+  var ch=D.txt[D.i], code=ENC[ch]; if(!code) return;
+  var nb=D.buf+sym;
+  if(code.indexOf(nb)===0){
+    D.buf=nb; dictRender();
+    if(nb===code){ D.hit++; keyTarget=null; $('#dCount').textContent=D.hit+'/'+D.tot;
+      $('#dBar').style.width=(D.hit/D.tot*100)+'%';
+      setTimeout(function(){ if(D&&!D.fin) dictNext(); },280); }
+  } else {
+    D.err++; D.buf=''; $('#dCode').className='dcode err';
+    setTimeout(function(){ if(D&&!D.fin) dictRender(); },340);
+  }
+}
+function dictFinish(){
+  if(!D) return; D.fin=true; keyTarget=null;
+  var T=L(), sec=Math.round((Date.now()-D.t0)/1000),
+      acc=Math.round(D.hit/Math.max(1,D.hit+D.err)*100);
+  dStrip();
+  $('#dAsk').textContent='';
+  $('#dLetter').textContent=T.ddone; $('#dLetter').className='dletter sp';
+  $('#dCode').innerHTML='<span class="dstat"><span>'+T.dtime+' <b>'+sec+'s</b></span>'
+    +'<span>'+T.derr+' <b>'+D.err+'</b></span><span>'+T.dacc+' <b>'+acc+'%</b></span></span>';
+  $('#dRh').textContent='';
+  var kp=$('#dKey'); if(kp&&kp.parentNode) kp.parentNode.classList.add('hide');
+  dRow().innerHTML='<button class="pb" id="dAgain" style="width:auto;padding:0 20px">'+T.dagain+'</button>'
+    +'<button class="pb" id="dNew" style="width:auto;padding:0 20px">'+T.dnew+'</button>';
+  bindDRow();
+}
 /* ============ KEY BINDING ============ */
 function bindKey(el){
   if(!el) return;
@@ -682,7 +854,10 @@ function applyLang(){
   $('#brandTxt').textContent=T.brand; $('#langBtn').textContent=T.code;
   $('#lblDec').textContent=T.dec; $('#copyBtn').textContent=T.copy; $('#clrBtn').textContent=T.clear;
   $('#keyT').textContent=T.key; $('#keyS').textContent=T.keyHint;
-  ['tab1','tab2','tab3','tab4'].forEach(function(id,i){ $('#'+id).textContent=T.tabs[i]; });
+  ['tab1','tab2','tab3','tab4','tab5'].forEach(function(id,i){ $('#'+id).textContent=T.tabs[i]; });
+  $('#t_dictIn').textContent=T.dictIn; $('#dStart').textContent=T.dstart; $('#t_dquick').textContent=T.dquick;
+  $('#dHint').innerHTML=T.dhint; $('#dKeyT').textContent=T.key; $('#dKeyS').textContent=T.keyHint;
+  $('#t_dsnd').textContent=T.dsnd;
   $('#t_txtIn').textContent=T.txtIn; $('#t_txtOut').textContent=T.txtOut; $('#t_quick').textContent=T.quick;
   $('#playBtn').textContent=playing?T.stop:T.play;
   $('#t_letters').textContent=T.letters; $('#t_digits').textContent=T.digits; $('#t_punct').textContent=T.punct;
@@ -702,12 +877,19 @@ function showScreen(name){
   $('#strip').classList.toggle('hide',name!=='key');
   $('#setBtn').classList.toggle('on',name==='set');
   if(name!=='test'&&Q) exitQuiz();
+  if(name!=='dict'){ if(keyTarget&&keyTarget.onSym) keyTarget=null; }
+  else if(D&&!D.fin&&D.txt[D.i]!==' ') keyTarget={onSym:dictPush};
+  if(name==='key') setTimeout(fitTree,30);
   if(name!=='text'&&playing){ stopPlay(); $('#playBtn').textContent=L().play; $('#led').classList.remove('on'); }
 }
 /* ============ WIRE ============ */
 function init(){
   document.addEventListener('pointerdown',function(){ AC(); },true);
-  bindKey($('#key'));
+  bindKey($('#key')); bindKey($('#dKey'));
+  $('#dStart').onclick=dictStart; $('#dExit').onclick=dictExit; bindDRow();
+  $('#zIn').onclick=function(){ zoomTree(.2); }; $('#zOut').onclick=function(){ zoomTree(-.2); };
+  window.addEventListener('resize',function(){ setTimeout(fitTree,60); });
+  window.addEventListener('orientationchange',function(){ setTimeout(fitTree,260); });
   $('#bDot').onclick=function(){ AC(); blip('.'); push('.'); };
   $('#bDash').onclick=function(){ AC(); blip('-'); push('-'); };
   $('#bLet').onclick=function(){ commitLetter(); };
@@ -728,9 +910,10 @@ function init(){
   $('#txtIn').addEventListener('input',renderMout);
   $('#playBtn').onclick=playCurrent;
   document.addEventListener('click',function(e){
-    var t=e.target.closest? e.target.closest('[data-code],[data-say],[data-lv],[data-v],[data-act]') : null;
+    var t=e.target.closest? e.target.closest('[data-code],[data-say],[data-dict],[data-lv],[data-v],[data-act]') : null;
     if(!t) return;
     if(t.hasAttribute('data-code')) return playText(dec(t.getAttribute('data-code'))||'',{});
+    if(t.hasAttribute('data-dict')){ $('#dictIn').value=t.getAttribute('data-dict'); return dictStart(); }
     if(t.hasAttribute('data-say')){ $('#txtIn').value=t.getAttribute('data-say'); renderMout(); showScreen('text'); return playCurrent(); }
     if(t.hasAttribute('data-lv')) return startLevel(+t.getAttribute('data-lv'));
     if(t.hasAttribute('data-v')) return answer(t,t.getAttribute('data-v'));
@@ -752,9 +935,13 @@ function init(){
   $('#swSnd').classList.toggle('on',!!S.snd); $('#swAuto').classList.toggle('on',!!S.auto);
   $('#swSnd').onclick=function(){ S.snd=!S.snd; this.classList.toggle('on',S.snd); save(); };
   $('#swAuto').onclick=function(){ S.auto=!S.auto; this.classList.toggle('on',S.auto); save(); };
+  $('#swDsnd').classList.toggle('on',S.dsnd!==false);
+  $('#swDsnd').onclick=function(){ S.dsnd=!S.dsnd; this.classList.toggle('on',S.dsnd); save(); };
   $('#resetBtn').onclick=function(){ PROG={}; saveProg(); renderLevels(); this.textContent='✓'; var b=this; setTimeout(function(){b.textContent=L().reset;},1000); };
   document.addEventListener('gesturestart',function(e){e.preventDefault();});
   applyLang(); renderOut(); showScreen('key');
+  [0,120,400,900].forEach(function(ms){ setTimeout(fitTree,ms); });
+  try{ new ResizeObserver(function(){ fitTree(); }).observe($('#treewrap')); }catch(e){}
 }
 function blip(sym){ if(!S.snd) return; toneOn(); setTimeout(toneOff,(sym==='.'?1:3)*unit()); }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
